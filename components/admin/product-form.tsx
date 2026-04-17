@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -60,6 +61,8 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
     stock: "",
     image_url: "",
     tags: "",
+    tax_rate: "0",
+    payment_methods: ["card", "cod"],
   })
 
   const handleChange = (
@@ -80,6 +83,15 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
     }))
   }
 
+  const handlePaymentMethodToggle = (method: string) => {
+    setFormData((prev) => {
+      const methods = prev.payment_methods.includes(method)
+        ? prev.payment_methods.filter((m) => m !== method)
+        : [...prev.payment_methods, method]
+      return { ...prev, payment_methods: methods }
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -95,6 +107,8 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
         stock: parseInt(formData.stock),
         image_url: formData.image_url,
         tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tax_rate: parseFloat(formData.tax_rate),
+        payment_methods: formData.payment_methods,
       }
 
       const response = await fetch(
@@ -299,6 +313,52 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
                 onChange={handleChange}
                 placeholder="https://example.com/image.jpg"
               />
+            </div>
+
+            {/* Tax & Payment Methods */}
+            <div className="grid gap-4">
+              <h3 className="font-semibold">Tax & Payment Settings</h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="tax_rate">Tax Rate (%)</Label>
+                <Input
+                  id="tax_rate"
+                  name="tax_rate"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={formData.tax_rate}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label>Payment Methods Available</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="payment_card"
+                      checked={formData.payment_methods.includes("card")}
+                      onCheckedChange={() => handlePaymentMethodToggle("card")}
+                    />
+                    <Label htmlFor="payment_card" className="font-normal cursor-pointer">
+                      Credit/Debit Card (Visa, Mastercard, Citrus, etc.)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="payment_cod"
+                      checked={formData.payment_methods.includes("cod")}
+                      onCheckedChange={() => handlePaymentMethodToggle("cod")}
+                    />
+                    <Label htmlFor="payment_cod" className="font-normal cursor-pointer">
+                      Cash on Delivery (COD)
+                    </Label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Actions */}

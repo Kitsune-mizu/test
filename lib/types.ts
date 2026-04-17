@@ -19,6 +19,8 @@ export interface Product {
   stock: number
   image_url: string | null
   tags: string[] | null
+  tax_rate: number // Percentage (0-100)
+  payment_methods: string[] // Array of payment methods: 'card', 'cod'
   created_at: string
 }
 
@@ -29,7 +31,9 @@ export interface Order {
   payment_method: string | null
   shipping_method: string | null
   shipping_address: string | null
-  status: 'pending' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled'
+  status: 'pending' | 'processing' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled'
+  order_number: string | null // Unique order number for invoice
+  invoice_url: string | null // URL to invoice/receipt
   created_at: string
 }
 
@@ -93,4 +97,18 @@ export interface OTPCode {
   verified_at: string | null
   attempts: number
   last_attempt_at: string | null
+}
+
+export interface SavedPaymentMethod {
+  id: string
+  user_id: string
+  method_type: 'card' | 'bank_account' // Type of payment method
+  card_number: string | null // Last 4 digits stored
+  card_holder: string | null
+  card_brand: string | null // Mastercard, Visa, Citrus, etc.
+  expiry_date: string | null // MM/YY format
+  is_default: boolean
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }

@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { formatDate, formatPrice } from "@/lib/format"
 import { ArrowLeft, MapPin, CreditCard, Truck, Zap } from "lucide-react"
 import { CancelOrderButton } from "@/components/account/cancel-order-button"
+import { InvoiceDisplay } from "@/components/account/invoice-display"
 import { isDemoAccount } from "@/lib/demo"
 
 interface OrderDetailPageProps {
@@ -238,6 +239,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               </p>
             </CardContent>
           </Card>
+
+          {/* Invoice Display */}
+          <InvoiceDisplay orderId={order.id} orderNumber={order.order_number} />
 
           {/* Actions */}
           {canCancel && (

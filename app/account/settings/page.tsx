@@ -1,15 +1,53 @@
 // app/account/settings/page.tsx
 
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
+import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ShieldCheck } from "lucide-react"
 import { ChangePasswordForm } from "@/components/account/change-password-form"
+import { PaymentMethodsList } from "@/components/account/payment-methods-list"
+import type { SavedPaymentMethod } from "@/lib/types"
+import { useEffect } from "react"
 
-export default async function CustomerSettingsPage() {
-  const supabase = await createClient()
+export default function CustomerSettingsPage() {
+  const [user, setUser] = useState<any>(null)
+  const [paymentMethods, setPaymentMethods] = useState<SavedPaymentMethod[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      setUser(authUser)
+
+      if (authUser) {
+        const response = await fetch("/api/payment-methods")
+        if (response.ok) {
+          const methods = await response.json()
+          setPaymentMethods(methods)
+        }
+      }
+
+      setIsLoading(false)
+    }
+
+    fetchData()
+  }, [])
+
+  const handlePaymentMethodAdded = async () => {
+    const response = await fetch("/api/payment-methods")
+    if (response.ok) {
+      const methods = await response.json()
+      setPaymentMethods(methods)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="space-y-6">Loading...</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -39,6 +77,19 @@ export default async function CustomerSettingsPage() {
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Methods */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Methods</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PaymentMethodsList
+            methods={paymentMethods}
+            onMethodAdded={handlePaymentMethodAdded}
+          />
         </CardContent>
       </Card>
 

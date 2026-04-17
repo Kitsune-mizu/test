@@ -30,12 +30,15 @@ export async function createOrderAction(params: CreateOrderParams) {
   // Check if this is a demo account
   const isDemo = isDemoAccount(user.email)
   
-  // For demo accounts, auto-confirm the order (status: confirmed)
+  // For demo accounts, set status to 'processing' then auto-update to 'confirmed'
   // For real accounts, orders start as pending and need payment confirmation
-  const orderStatus = isDemo ? "confirmed" : "pending"
+  const orderStatus = isDemo ? "processing" : "pending"
   
   // Generate alphanumeric order ID
   const orderId = generateOrderId()
+  
+  // Generate order number for invoice
+  const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
   // Create order
   const { data: order, error: orderError } = await supabase
@@ -48,6 +51,7 @@ export async function createOrderAction(params: CreateOrderParams) {
       shipping_method: params.shippingMethod,
       shipping_address: params.shippingAddress,
       status: orderStatus,
+      order_number: orderNumber,
     })
     .select("id")
     .single()
@@ -87,10 +91,18 @@ export async function createOrderAction(params: CreateOrderParams) {
   // Clear cart
   await supabase.from("cart").delete().eq("user_id", user.id)
 
+  // For demo accounts, immediately update status to 'confirmed' to simulate successful payment
+  if (isDemo) {
+    await supabase
+      .from("orders")
+      .update({ status: "confirmed" })
+      .eq("id", order.id)
+  }
+
   // Create notification
   await supabase.from("notifications").insert({
     user_id: user.id,
-    message: `Your order #${orderId} has been ${isDemo ? "created in test mode" : "placed successfully"}!`,
+    message: `Your order #${orderNumber} has been ${isDemo ? "created in test mode" : "placed successfully"}!`,
     link: `/account/orders/${orderId}`,
     type: "order",
   })

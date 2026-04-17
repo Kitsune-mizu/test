@@ -85,7 +85,11 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
       setIsSubmitting(false)
     } else {
       toast.success("Order placed successfully!")
-      router.push(`/account/orders/${result.orderId}`)
+      // Redirect to success page for demo accounts, otherwise to order detail
+      const successPath = isDemoMode
+        ? `/account/orders/${result.orderId}/success`
+        : `/account/orders/${result.orderId}`
+      router.push(successPath)
     }
   }
 
