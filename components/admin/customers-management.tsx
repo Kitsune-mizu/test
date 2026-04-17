@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,85 +10,87 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Users, Search } from 'lucide-react'
-import { debounce } from 'lodash-es'
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Users, Search } from "lucide-react";
+import { debounce } from "lodash-es";
 
 interface Customer {
-  id: string
-  name: string | null
-  email: string | null
-  phone: string | null
-  address: string | null
-  role: string
-  created_at: string
-  orders: { count: number }[]
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  role: string;
+  created_at: string;
+  orders: { count: number }[];
 }
 
 export function CustomersManagement() {
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [totalCount, setTotalCount] = useState(0)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [error, setError] = useState<string | null>(null)
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
-  const pageSize = 20
+  const pageSize = 20;
 
-  const fetchCustomers = async (searchTerm: string = '', page: number = 0) => {
+  const fetchCustomers = async (searchTerm: string = "", page: number = 0) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const params = new URLSearchParams({
         search: searchTerm,
         limit: pageSize.toString(),
         offset: (page * pageSize).toString(),
-      })
+      });
 
-      const response = await fetch(`/api/admin/customers?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch customers')
+      const response = await fetch(`/api/admin/customers?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch customers");
 
-      const data = await response.json()
-      setCustomers(data.customers)
-      setTotalCount(data.total)
-      setError(null)
+      const data = await response.json();
+      setCustomers(data.customers);
+      setTotalCount(data.total);
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const debouncedSearch = debounce((searchTerm: string) => {
-    setCurrentPage(0)
-    fetchCustomers(searchTerm, 0)
-  }, 500)
+    setCurrentPage(0);
+    fetchCustomers(searchTerm, 0);
+  }, 500);
 
   useEffect(() => {
-    fetchCustomers('', 0)
-  }, [])
+    fetchCustomers("", 0);
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-    debouncedSearch(e.target.value)
-  }
+    setSearch(e.target.value);
+    debouncedSearch(e.target.value);
+  };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-    fetchCustomers(search, newPage)
-  }
+    setCurrentPage(newPage);
+    fetchCustomers(search, newPage);
+  };
 
-  const totalPages = Math.ceil(totalCount / pageSize)
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-heading font-bold">Customers</h1>
-        <p className="text-muted-foreground">Manage and analyze customer data</p>
+        <p className="text-muted-foreground">
+          Manage and analyze customer data
+        </p>
       </div>
 
       {/* Search */}
@@ -161,11 +163,13 @@ export function CustomersManagement() {
                   customers.map((customer) => (
                     <TableRow key={customer.id}>
                       <TableCell className="font-medium">
-                        {customer.name || 'N/A'}
+                        {customer.name || "N/A"}
                       </TableCell>
-                      <TableCell className="text-sm">{customer.email || 'N/A'}</TableCell>
                       <TableCell className="text-sm">
-                        {customer.phone || '-'}
+                        {customer.email || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {customer.phone || "-"}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline">
@@ -227,5 +231,5 @@ export function CustomersManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

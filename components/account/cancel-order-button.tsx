@@ -1,10 +1,10 @@
 // components/account/cancel-order-button.tsx
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,54 +15,57 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
-import { Loader2, XCircle } from "lucide-react"
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { Loader2, XCircle } from "lucide-react";
 
 interface CancelOrderButtonProps {
-  orderId: string
-  orderStatus: string
+  orderId: string;
+  orderStatus: string;
 }
 
-export function CancelOrderButton({ orderId, orderStatus }: CancelOrderButtonProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-  
+export function CancelOrderButton({
+  orderId,
+  orderStatus,
+}: CancelOrderButtonProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   // Only allow cancellation if order is in "pending" or "confirmed" status
-  const canCancel = ["pending", "confirmed"].includes(orderStatus)
+  const canCancel = ["pending", "confirmed"].includes(orderStatus);
 
   const handleCancel = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const supabase = createClient()
-      
+      const supabase = createClient();
+
       const { error } = await supabase
         .from("orders")
         .update({ status: "cancelled" })
-        .eq("id", orderId)
+        .eq("id", orderId);
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      toast.success("Order cancelled successfully")
-      setIsOpen(false)
-      router.refresh()
+      toast.success("Order cancelled successfully");
+      setIsOpen(false);
+      router.refresh();
     } catch (error) {
-      console.error("Error cancelling order:", error)
-      toast.error("Failed to cancel order. Please try again.")
+      console.error("Error cancelling order:", error);
+      toast.error("Failed to cancel order. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button 
-          variant="destructive" 
+        <Button
+          variant="destructive"
           className="w-full"
           disabled={!canCancel}
           title={!canCancel ? `Cannot cancel ${orderStatus} orders` : ""}
@@ -75,13 +78,12 @@ export function CancelOrderButton({ orderId, orderStatus }: CancelOrderButtonPro
         <AlertDialogHeader>
           <AlertDialogTitle>Cancel Order</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to cancel this order? This action cannot be undone.
+            Are you sure you want to cancel this order? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>
-            Keep Order
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Keep Order</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleCancel}
             disabled={isLoading}
@@ -99,5 +101,5 @@ export function CancelOrderButton({ orderId, orderStatus }: CancelOrderButtonPro
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

@@ -1,20 +1,22 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 interface UpdateProfileParams {
-  name: string
-  phone: string
-  address: string
+  name: string;
+  phone: string;
+  address: string;
 }
 
 export async function updateProfileAction(params: UpdateProfileParams) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   const { error } = await supabase
@@ -24,10 +26,10 @@ export async function updateProfileAction(params: UpdateProfileParams) {
       phone: params.phone || null,
       address: params.address || null,
     })
-    .eq("id", user.id)
+    .eq("id", user.id);
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message };
 
-  revalidatePath("/account")
-  return { success: true }
+  revalidatePath("/account");
+  return { success: true };
 }

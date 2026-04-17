@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart } from "lucide-react";
 
 interface FloatingCartItemProps {
-  onComplete: () => void
+  onComplete: () => void;
 }
 
 export function FloatingCartItem({ onComplete }: FloatingCartItemProps) {
   return (
-    <div 
+    <div
       className="fixed pointer-events-none"
       style={{
         animation: `floatToCart 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
         zIndex: 9999,
       }}
       onAnimationEnd={onComplete}
@@ -24,5 +24,5 @@ export function FloatingCartItem({ onComplete }: FloatingCartItemProps) {
         <span className="font-medium text-sm">Added to cart!</span>
       </div>
     </div>
-  )
+  );
 }

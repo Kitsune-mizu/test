@@ -1,11 +1,11 @@
-import { Suspense } from "react"
-import { ProductEditForm } from "@/components/admin/product-edit-form"
-import { JapaneseSkeleton } from "@/components/loaders/japanese-loader"
+import { Suspense } from "react";
+import { ProductEditForm } from "@/components/admin/product-edit-form";
+import { JapaneseSkeleton } from "@/components/loaders/japanese-loader";
 
 export const metadata = {
   title: "Add New Product",
   description: "Create a new product for your store",
-}
+};
 
 export default function AdminNewProductPage() {
   return (
@@ -14,5 +14,5 @@ export default function AdminNewProductPage() {
         <ProductEditForm mode="create" />
       </div>
     </Suspense>
-  )
+  );
 }

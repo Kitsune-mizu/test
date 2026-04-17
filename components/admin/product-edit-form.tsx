@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "sonner"
-import { Loader2, ArrowLeft, ShoppingCart } from "lucide-react"
-import { formatPrice } from "@/lib/format"
-import { Badge } from "@/components/ui/badge"
-import type { Product } from "@/lib/types"
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Loader2, ArrowLeft, ShoppingCart } from "lucide-react";
+import { formatPrice } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
+import type { Product } from "@/lib/types";
 
 const categories = [
   "Backpacks",
@@ -32,7 +32,7 @@ const categories = [
   "Accessories",
   "Climbing",
   "Navigation",
-]
+];
 
 const brands = [
   "Patagonia",
@@ -45,17 +45,21 @@ const brands = [
   "Garmin",
   "Nalgene",
   "Coleman",
-]
+];
 
 interface ProductEditFormProps {
-  product?: Product
-  mode: "create" | "edit"
-  productId?: string
+  product?: Product;
+  mode: "create" | "edit";
+  productId?: string;
 }
 
-export function ProductEditForm({ product, mode, productId }: ProductEditFormProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+export function ProductEditForm({
+  product,
+  mode,
+  productId,
+}: ProductEditFormProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: product?.name || "",
     slug: product?.slug || "",
@@ -68,38 +72,40 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
     tags: product?.tags?.join(", ") || "",
     tax_rate: product?.tax_rate?.toString() || "0",
     payment_methods: product?.payment_methods || ["card", "cod"],
-  })
+  });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === "name" && { slug: value.toLowerCase().replace(/\s+/g, "-") }),
-    }))
-  }
+      ...(name === "name" && {
+        slug: value.toLowerCase().replace(/\s+/g, "-"),
+      }),
+    }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handlePaymentMethodToggle = (method: string) => {
     setFormData((prev) => {
       const methods = prev.payment_methods.includes(method as never)
         ? prev.payment_methods.filter((m) => m !== method)
-        : [...prev.payment_methods, method as never]
-      return { ...prev, payment_methods: methods }
-    })
-  }
+        : [...prev.payment_methods, method as never];
+      return { ...prev, payment_methods: methods };
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       const payload = {
@@ -111,42 +117,45 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
         image_url: formData.image_url,
-        tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
         tax_rate: parseFloat(formData.tax_rate),
         payment_methods: formData.payment_methods,
-      }
+      };
 
       const response = await fetch(
-        mode === "create"
-          ? "/api/products"
-          : `/api/products/${productId}`,
+        mode === "create" ? "/api/products" : `/api/products/${productId}`,
         {
           method: mode === "create" ? "POST" : "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        }
-      )
+        },
+      );
 
-      if (!response.ok) throw new Error("Failed to save product")
+      if (!response.ok) throw new Error("Failed to save product");
 
       toast.success(
         mode === "create"
           ? "Product created successfully"
-          : "Product updated successfully"
-      )
+          : "Product updated successfully",
+      );
 
-      router.push("/admin/products")
-      router.refresh()
+      router.push("/admin/products");
+      router.refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong")
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const price = parseFloat(formData.price) || 0
-  const tax = price * (parseFloat(formData.tax_rate) / 100)
-  const totalPrice = price + tax
+  const price = parseFloat(formData.price) || 0;
+  const tax = price * (parseFloat(formData.tax_rate) / 100);
+  const totalPrice = price + tax;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -351,20 +360,32 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="payment_card"
-                        checked={formData.payment_methods.includes("card" as never)}
-                        onCheckedChange={() => handlePaymentMethodToggle("card")}
+                        checked={formData.payment_methods.includes(
+                          "card" as never,
+                        )}
+                        onCheckedChange={() =>
+                          handlePaymentMethodToggle("card")
+                        }
                       />
-                      <Label htmlFor="payment_card" className="font-normal cursor-pointer">
+                      <Label
+                        htmlFor="payment_card"
+                        className="font-normal cursor-pointer"
+                      >
                         Credit/Debit Card (Visa, Mastercard, Citrus, etc.)
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="payment_cod"
-                        checked={formData.payment_methods.includes("cod" as never)}
+                        checked={formData.payment_methods.includes(
+                          "cod" as never,
+                        )}
                         onCheckedChange={() => handlePaymentMethodToggle("cod")}
                       />
-                      <Label htmlFor="payment_cod" className="font-normal cursor-pointer">
+                      <Label
+                        htmlFor="payment_cod"
+                        className="font-normal cursor-pointer"
+                      >
                         Cash on Delivery (COD)
                       </Label>
                     </div>
@@ -374,11 +395,7 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
 
               {/* Actions */}
               <div className="flex gap-4 pt-4 border-t">
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="gap-2"
-                >
+                <Button type="submit" disabled={isLoading} className="gap-2">
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -455,8 +472,12 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
                 </p>
                 {parseFloat(formData.tax_rate) > 0 && (
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>Tax ({formData.tax_rate}%): {formatPrice(tax)}</p>
-                    <p className="font-semibold text-foreground">Total: {formatPrice(totalPrice)}</p>
+                    <p>
+                      Tax ({formData.tax_rate}%): {formatPrice(tax)}
+                    </p>
+                    <p className="font-semibold text-foreground">
+                      Total: {formatPrice(totalPrice)}
+                    </p>
                   </div>
                 )}
               </div>
@@ -466,7 +487,10 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
                 {parseInt(formData.stock) === 0 ? (
                   <Badge variant="destructive">Out of Stock</Badge>
                 ) : parseInt(formData.stock) <= 5 ? (
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-100 text-orange-800"
+                  >
                     Only {formData.stock} left in stock
                   </Badge>
                 ) : (
@@ -478,7 +502,9 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
 
               {/* Description */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Description</h4>
+                <h4 className="text-sm font-semibold text-foreground mb-2">
+                  Description
+                </h4>
                 <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   {formData.description || "No description added yet"}
                 </p>
@@ -487,10 +513,16 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
               {/* Tags */}
               {formData.tags && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-foreground">Tags</h4>
+                  <h4 className="text-sm font-semibold text-foreground">
+                    Tags
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.split(",").map((tag) => (
-                      <Badge key={tag.trim()} variant="outline" className="text-xs">
+                      <Badge
+                        key={tag.trim()}
+                        variant="outline"
+                        className="text-xs"
+                      >
                         {tag.trim()}
                       </Badge>
                     ))}
@@ -500,11 +532,15 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
 
               {/* Features */}
               <div className="border-t pt-4 space-y-3">
-                <h4 className="text-sm font-semibold text-foreground">Details</h4>
+                <h4 className="text-sm font-semibold text-foreground">
+                  Details
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Category:</span>
-                    <span className="font-medium">{formData.category || "-"}</span>
+                    <span className="font-medium">
+                      {formData.category || "-"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Brand:</span>
@@ -516,7 +552,9 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Slug:</span>
-                    <span className="font-medium text-xs">{formData.slug || "-"}</span>
+                    <span className="font-medium text-xs">
+                      {formData.slug || "-"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -531,5 +569,5 @@ export function ProductEditForm({ product, mode, productId }: ProductEditFormPro
         </Card>
       </div>
     </div>
-  )
+  );
 }

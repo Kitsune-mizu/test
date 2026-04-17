@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { ProductCard } from "./product-card"
-import { useCartActions } from "@/hooks/use-cart-actions"
-import { useWishlistActions } from "@/hooks/use-wishlist-actions"
-import type { Product } from "@/lib/types"
-import { PackageX } from "lucide-react"
+import { ProductCard } from "./product-card";
+import { useCartActions } from "@/hooks/use-cart-actions";
+import { useWishlistActions } from "@/hooks/use-wishlist-actions";
+import type { Product } from "@/lib/types";
+import { PackageX } from "lucide-react";
 
 interface ProductsGridProps {
-  products: Product[]
+  products: Product[];
 }
 
 export function ProductsGrid({ products }: ProductsGridProps) {
-  const { addToCart } = useCartActions()
-  const { toggleWishlist, wishlistIds } = useWishlistActions()
+  const { addToCart } = useCartActions();
+  const { toggleWishlist, wishlistIds } = useWishlistActions();
 
   if (products.length === 0) {
     return (
@@ -25,7 +25,7 @@ export function ProductsGrid({ products }: ProductsGridProps) {
           Try adjusting your filters or search terms
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -40,5 +40,5 @@ export function ProductsGrid({ products }: ProductsGridProps) {
         />
       ))}
     </div>
-  )
+  );
 }

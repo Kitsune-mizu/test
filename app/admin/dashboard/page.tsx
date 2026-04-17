@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { DashboardStats } from '@/components/admin/dashboard-stats'
-import { RecentOrders } from '@/components/admin/recent-orders'
-import { LowStockAlerts } from '@/components/admin/low-stock-alerts'
-import { JapaneseSkeleton } from '@/components/loaders/japanese-loader'
+import { Suspense } from "react";
+import { DashboardStats } from "@/components/admin/dashboard-stats";
+import { RecentOrders } from "@/components/admin/recent-orders";
+import { LowStockAlerts } from "@/components/admin/low-stock-alerts";
+import { JapaneseSkeleton } from "@/components/loaders/japanese-loader";
 
 export default function AdminDashboard() {
   return (
@@ -12,7 +12,9 @@ export default function AdminDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-heading font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here&apos;s your store overview.</p>
+        <p className="text-muted-foreground">
+          Welcome back! Here&apos;s your store overview.
+        </p>
       </div>
 
       <Suspense fallback={<JapaneseSkeleton />}>
@@ -26,5 +28,5 @@ export default function AdminDashboard() {
         <LowStockAlerts />
       </Suspense>
     </div>
-  )
+  );
 }

@@ -1,19 +1,19 @@
-import { notFound } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { createClient } from "@/lib/supabase/server"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { formatDate, formatPrice } from "@/lib/format"
-import { ArrowLeft, MapPin, CreditCard, Truck, Zap } from "lucide-react"
-import { CancelOrderButton } from "@/components/account/cancel-order-button"
-import { InvoiceDisplay } from "@/components/account/invoice-display"
-import { isDemoAccount } from "@/lib/demo"
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { formatDate, formatPrice } from "@/lib/format";
+import { ArrowLeft, MapPin, CreditCard, Truck, Zap } from "lucide-react";
+import { CancelOrderButton } from "@/components/account/cancel-order-button";
+import { InvoiceDisplay } from "@/components/account/invoice-display";
+import { isDemoAccount } from "@/lib/demo";
 
 interface OrderDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 const statusColors: Record<string, string> = {
@@ -23,19 +23,30 @@ const statusColors: Record<string, string> = {
   shipped: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
   delivered: "bg-green-500/10 text-green-600 border-green-500/20",
   cancelled: "bg-red-500/10 text-red-600 border-red-500/20",
-}
+};
 
-const statusSteps = ["pending", "confirmed", "preparing", "shipped", "delivered"]
+const statusSteps = [
+  "pending",
+  "confirmed",
+  "preparing",
+  "shipped",
+  "delivered",
+];
 
-export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const { id } = await params
-  const supabase = await createClient()
+export default async function OrderDetailPage({
+  params,
+}: OrderDetailPageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
 
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
   const { data: order } = await supabase
     .from("orders")
-    .select(`
+    .select(
+      `
       *,
       order_items (
         id,
@@ -43,20 +54,21 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         price,
         products (id, name, slug, image_url)
       )
-    `)
+    `,
+    )
     .eq("id", id)
     .eq("user_id", authUser!.id)
-    .single()
+    .single();
 
   if (!order) {
-    notFound()
+    notFound();
   }
 
   // Check if this is a demo account order
-  const isDemoOrder = isDemoAccount(authUser?.email)
+  const isDemoOrder = isDemoAccount(authUser?.email);
 
-  const currentStepIndex = statusSteps.indexOf(order.status)
-  const canCancel = ["pending", "confirmed"].includes(order.status)
+  const currentStepIndex = statusSteps.indexOf(order.status);
+  const canCancel = ["pending", "confirmed"].includes(order.status);
 
   return (
     <div>
@@ -70,10 +82,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-heading text-2xl font-bold">
-            Order #{order.id}
-          </h1>
-          <p className="text-muted-foreground">{formatDate(order.created_at)}</p>
+          <h1 className="font-heading text-2xl font-bold">Order #{order.id}</h1>
+          <p className="text-muted-foreground">
+            {formatDate(order.created_at)}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {isDemoOrder && (
@@ -107,7 +119,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
               {/* Steps */}
               {statusSteps.map((step, index) => (
-                <div key={step} className="relative z-10 flex flex-col items-center">
+                <div
+                  key={step}
+                  className="relative z-10 flex flex-col items-center"
+                >
                   <div
                     className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium ${
                       index <= currentStepIndex
@@ -136,56 +151,65 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {order.order_items.map((item: {
-                  id: string
-                  quantity: number
-                  price: number
-                  products: { id: string; name: string; slug: string; image_url: string | null } | null
-                }) => {
-                  const product = item.products
-                  if (!product) return null
+                {order.order_items.map(
+                  (item: {
+                    id: string;
+                    quantity: number;
+                    price: number;
+                    products: {
+                      id: string;
+                      name: string;
+                      slug: string;
+                      image_url: string | null;
+                    } | null;
+                  }) => {
+                    const product = item.products;
+                    if (!product) return null;
 
-                  return (
-                    <div key={item.id} className="flex gap-4">
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                        {product.image_url ? (
-                          <Image
-                            src={product.image_url}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-muted-foreground text-xs">
-                            No image
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <Link
-                          href={`/products/${product.slug}`}
-                          className="font-medium hover:text-primary transition-colors line-clamp-1"
-                        >
-                          {product.name}
-                        </Link>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity} x {formatPrice(item.price)}
+                    return (
+                      <div key={item.id} className="flex gap-4">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+                          {product.image_url ? (
+                            <Image
+                              src={product.image_url}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-muted-foreground text-xs">
+                              No image
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/products/${product.slug}`}
+                            className="font-medium hover:text-primary transition-colors line-clamp-1"
+                          >
+                            {product.name}
+                          </Link>
+                          <p className="text-sm text-muted-foreground">
+                            Qty: {item.quantity} x {formatPrice(item.price)}
+                          </p>
+                        </div>
+                        <p className="font-medium">
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
-                      <p className="font-medium">
-                        {formatPrice(item.price * item.quantity)}
-                      </p>
-                    </div>
-                  )
-                })}
+                    );
+                  },
+                )}
               </div>
 
               <Separator className="my-4" />
 
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span className="text-primary">{formatPrice(order.total_price)}</span>
+                <span className="text-primary">
+                  {formatPrice(order.total_price)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -250,5 +274,5 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         </div>
       </div>
     </div>
-  )
+  );
 }

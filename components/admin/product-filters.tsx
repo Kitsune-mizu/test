@@ -1,39 +1,45 @@
-'use client'
+"use client";
 
-import { useState, useCallback } from 'react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, X, Filter } from 'lucide-react'
-import { Card } from '@/components/ui/card'
+import { useState, useCallback } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, X, Filter } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface ProductFiltersProps {
-  onSearch: (query: string) => void
-  onSort: (field: string, order: 'asc' | 'desc') => void
-  onFilter: (filters: any) => void
-  isLoading?: boolean
+  onSearch: (query: string) => void;
+  onSort: (field: string, order: "asc" | "desc") => void;
+  onFilter: (filters: any) => void;
+  isLoading?: boolean;
 }
 
 const SORT_OPTIONS = [
-  { value: 'created_at-desc', label: 'Newest First' },
-  { value: 'created_at-asc', label: 'Oldest First' },
-  { value: 'name-asc', label: 'Name: A to Z' },
-  { value: 'name-desc', label: 'Name: Z to A' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'stock-asc', label: 'Stock: Low to High' },
-  { value: 'stock-desc', label: 'Stock: High to Low' },
-]
+  { value: "created_at-desc", label: "Newest First" },
+  { value: "created_at-asc", label: "Oldest First" },
+  { value: "name-asc", label: "Name: A to Z" },
+  { value: "name-desc", label: "Name: Z to A" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "stock-asc", label: "Stock: Low to High" },
+  { value: "stock-desc", label: "Stock: High to Low" },
+];
 
 const CATEGORY_OPTIONS = [
-  'Electronics',
-  'Clothing',
-  'Books',
-  'Home & Garden',
-  'Sports',
-  'Toys',
-  'Other',
-]
+  "Electronics",
+  "Clothing",
+  "Books",
+  "Home & Garden",
+  "Sports",
+  "Toys",
+  "Other",
+];
 
 export function ProductFilters({
   onSearch,
@@ -41,42 +47,42 @@ export function ProductFilters({
   onFilter,
   isLoading,
 }: ProductFiltersProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortValue, setSortValue] = useState('created_at-desc')
-  const [category, setCategory] = useState('')
-  const [stockFilter, setStockFilter] = useState('')
-  const [showFilters, setShowFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortValue, setSortValue] = useState("created_at-desc");
+  const [category, setCategory] = useState("");
+  const [stockFilter, setStockFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleSearch = useCallback(
     (value: string) => {
-      setSearchQuery(value)
-      onSearch(value)
+      setSearchQuery(value);
+      onSearch(value);
     },
-    [onSearch]
-  )
+    [onSearch],
+  );
 
   const handleSort = (value: string) => {
-    setSortValue(value)
-    const [field, order] = value.split('-') as [string, 'asc' | 'desc']
-    onSort(field, order)
-  }
+    setSortValue(value);
+    const [field, order] = value.split("-") as [string, "asc" | "desc"];
+    onSort(field, order);
+  };
 
   const handleFilterChange = () => {
     onFilter({
       category: category || null,
       stock: stockFilter || null,
-    })
-  }
+    });
+  };
 
   const handleReset = () => {
-    setSearchQuery('')
-    setSortValue('created_at-desc')
-    setCategory('')
-    setStockFilter('')
-    onSearch('')
-    onSort('created_at', 'desc')
-    onFilter({})
-  }
+    setSearchQuery("");
+    setSortValue("created_at-desc");
+    setCategory("");
+    setStockFilter("");
+    onSearch("");
+    onSort("created_at", "desc");
+    onFilter({});
+  };
 
   return (
     <div className="space-y-4">
@@ -93,7 +99,7 @@ export function ProductFilters({
           />
           {searchQuery && (
             <button
-              onClick={() => handleSearch('')}
+              onClick={() => handleSearch("")}
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
               <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
@@ -130,7 +136,11 @@ export function ProductFilters({
           {/* Category Filter */}
           <div>
             <label className="text-sm font-medium mb-2 block">Category</label>
-            <Select value={category} onValueChange={setCategory} disabled={isLoading}>
+            <Select
+              value={category}
+              onValueChange={setCategory}
+              disabled={isLoading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -147,8 +157,14 @@ export function ProductFilters({
 
           {/* Stock Filter */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Stock Status</label>
-            <Select value={stockFilter} onValueChange={setStockFilter} disabled={isLoading}>
+            <label className="text-sm font-medium mb-2 block">
+              Stock Status
+            </label>
+            <Select
+              value={stockFilter}
+              onValueChange={setStockFilter}
+              disabled={isLoading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="All Stock Levels" />
               </SelectTrigger>
@@ -173,5 +189,5 @@ export function ProductFilters({
         </Card>
       )}
     </div>
-  )
+  );
 }

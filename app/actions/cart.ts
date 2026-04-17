@@ -1,14 +1,16 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 export async function addToCartAction(productId: string, quantity: number = 1) {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   // Check if product exists and has stock
@@ -16,14 +18,14 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
     .from("products")
     .select("id, stock")
     .eq("id", productId)
-    .single()
+    .single();
 
   if (!product) {
-    return { error: "Product not found" }
+    return { error: "Product not found" };
   }
 
   if (product.stock < quantity) {
-    return { error: "Not enough stock available" }
+    return { error: "Not enough stock available" };
   }
 
   // Check if item already in cart
@@ -32,48 +34,51 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
     .select("id, quantity")
     .eq("user_id", user.id)
     .eq("product_id", productId)
-    .single()
+    .single();
 
   if (existingItem) {
     // Update quantity
-    const newQuantity = existingItem.quantity + quantity
+    const newQuantity = existingItem.quantity + quantity;
     if (newQuantity > product.stock) {
-      return { error: "Not enough stock available" }
+      return { error: "Not enough stock available" };
     }
 
     const { error } = await supabase
       .from("cart")
       .update({ quantity: newQuantity })
-      .eq("id", existingItem.id)
+      .eq("id", existingItem.id);
 
-    if (error) return { error: error.message }
+    if (error) return { error: error.message };
   } else {
     // Insert new item
-    const { error } = await supabase
-      .from("cart")
-      .insert({
-        user_id: user.id,
-        product_id: productId,
-        quantity,
-      })
+    const { error } = await supabase.from("cart").insert({
+      user_id: user.id,
+      product_id: productId,
+      quantity,
+    });
 
-    if (error) return { error: error.message }
+    if (error) return { error: error.message };
   }
 
-  revalidatePath("/", "layout")
-  return { success: true }
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
-export async function updateCartQuantityAction(cartItemId: string, quantity: number) {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+export async function updateCartQuantityAction(
+  cartItemId: string,
+  quantity: number,
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   if (quantity < 1) {
-    return removeFromCartAction(cartItemId)
+    return removeFromCartAction(cartItemId);
   }
 
   // Get cart item with product info
@@ -82,64 +87,65 @@ export async function updateCartQuantityAction(cartItemId: string, quantity: num
     .select("id, product_id, products(stock)")
     .eq("id", cartItemId)
     .eq("user_id", user.id)
-    .single()
+    .single();
 
   if (!cartItem) {
-    return { error: "Cart item not found" }
+    return { error: "Cart item not found" };
   }
 
-  const product = cartItem.products as { stock: number } | null
+  const product = cartItem.products as { stock: number } | null;
   if (product && quantity > product.stock) {
-    return { error: "Not enough stock available" }
+    return { error: "Not enough stock available" };
   }
 
   const { error } = await supabase
     .from("cart")
     .update({ quantity })
     .eq("id", cartItemId)
-    .eq("user_id", user.id)
+    .eq("user_id", user.id);
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message };
 
-  revalidatePath("/", "layout")
-  return { success: true }
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
 export async function removeFromCartAction(cartItemId: string) {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   const { error } = await supabase
     .from("cart")
     .delete()
     .eq("id", cartItemId)
-    .eq("user_id", user.id)
+    .eq("user_id", user.id);
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message };
 
-  revalidatePath("/", "layout")
-  return { success: true }
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
 export async function clearCartAction() {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
-  const { error } = await supabase
-    .from("cart")
-    .delete()
-    .eq("user_id", user.id)
+  const { error } = await supabase.from("cart").delete().eq("user_id", user.id);
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message };
 
-  revalidatePath("/", "layout")
-  return { success: true }
+  revalidatePath("/", "layout");
+  return { success: true };
 }

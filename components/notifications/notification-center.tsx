@@ -1,112 +1,114 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRealtimeNotifications } from '@/lib/hooks/use-realtime'
-import { NotificationItem } from './notification-item'
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRealtimeNotifications } from "@/lib/hooks/use-realtime";
+import { NotificationItem } from "./notification-item";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { Bell, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Bell, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Notification {
-  id: string
-  message: string
-  type: string
-  read_status: boolean
-  created_at: string
-  link: string | null
+  id: string;
+  message: string;
+  type: string;
+  read_status: boolean;
+  created_at: string;
+  link: string | null;
 }
 
 export function NotificationCenter() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [userRole, setUserRole] = useState<string>('customer')
-  const { notifications, unreadCount } = useRealtimeNotifications(userId)
-  const supabase = createClient()
+  const [isOpen, setIsOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>("customer");
+  const { notifications, unreadCount } = useRealtimeNotifications(userId);
+  const supabase = createClient();
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
-        setUserId(user.id)
-        setUserRole(user.user_metadata?.role || 'customer')
+        setUserId(user.id);
+        setUserRole(user.user_metadata?.role || "customer");
       }
-    }
-    getUser()
-  }, [supabase])
+    };
+    getUser();
+  }, [supabase]);
 
   const handleMarkAsRead = async (notificationId: string, isRead: boolean) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ read_status: !isRead }),
-      })
+      });
 
-      if (!response.ok) throw new Error('Failed to update notification')
-      toast.success(isRead ? 'Marked as unread' : 'Marked as read')
+      if (!response.ok) throw new Error("Failed to update notification");
+      toast.success(isRead ? "Marked as unread" : "Marked as read");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error')
+      toast.error(error instanceof Error ? error.message : "Error");
     }
-  }
+  };
 
   const handleDelete = async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
-      if (!response.ok) throw new Error('Failed to delete notification')
-      toast.success('Notification deleted')
+      if (!response.ok) throw new Error("Failed to delete notification");
+      toast.success("Notification deleted");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error')
+      toast.error(error instanceof Error ? error.message : "Error");
     }
-  }
+  };
 
   const handleMarkAllAsRead = async () => {
     try {
-      const unreadNotifications = notifications.filter((n) => !n.read_status)
-      
+      const unreadNotifications = notifications.filter((n) => !n.read_status);
+
       await Promise.all(
         unreadNotifications.map((n) =>
           fetch(`/api/notifications/${n.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ read_status: true }),
-          })
-        )
-      )
-      
-      toast.success('All notifications marked as read')
+          }),
+        ),
+      );
+
+      toast.success("All notifications marked as read");
     } catch (error) {
-      toast.error('Failed to mark all as read')
+      toast.error("Failed to mark all as read");
     }
-  }
+  };
 
   const handleClearAll = async () => {
     try {
       await Promise.all(
         notifications.map((n) =>
           fetch(`/api/notifications/${n.id}`, {
-            method: 'DELETE',
-          })
-        )
-      )
-      
-      toast.success('All notifications cleared')
+            method: "DELETE",
+          }),
+        ),
+      );
+
+      toast.success("All notifications cleared");
     } catch (error) {
-      toast.error('Failed to clear notifications')
+      toast.error("Failed to clear notifications");
     }
-  }
+  };
 
   return (
     <>
@@ -121,7 +123,7 @@ export function NotificationCenter() {
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-white text-xs">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </Badge>
         )}
       </Button>
@@ -131,7 +133,9 @@ export function NotificationCenter() {
         <SheetContent className="w-full sm:w-96 flex flex-col">
           <SheetHeader className="border-b pb-3">
             <div className="flex items-center justify-between">
-              <SheetTitle>Notifications {userRole === 'admin' && '(管理者)'}</SheetTitle>
+              <SheetTitle>
+                Notifications {userRole === "admin" && "(管理者)"}
+              </SheetTitle>
               {notifications.length > 0 && (
                 <div className="flex gap-2">
                   {unreadCount > 0 && (
@@ -187,5 +191,5 @@ export function NotificationCenter() {
         </SheetContent>
       </Sheet>
     </>
-  )
+  );
 }

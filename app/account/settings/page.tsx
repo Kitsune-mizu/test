@@ -1,54 +1,58 @@
 // app/account/settings/page.tsx
 
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { ShieldCheck, Lock } from "lucide-react"
-import { ChangePasswordForm } from "@/components/account/change-password-form"
-import { PaymentMethodsList } from "@/components/account/payment-methods-list"
-import type { SavedPaymentMethod } from "@/lib/types"
-import { useEffect } from "react"
+import { useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck, Lock } from "lucide-react";
+import { ChangePasswordForm } from "@/components/account/change-password-form";
+import { PaymentMethodsList } from "@/components/account/payment-methods-list";
+import type { SavedPaymentMethod } from "@/lib/types";
+import { useEffect } from "react";
 
 export default function CustomerSettingsPage() {
-  const [user, setUser] = useState<any>(null)
-  const [paymentMethods, setPaymentMethods] = useState<SavedPaymentMethod[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClient()
+  const [user, setUser] = useState<any>(null);
+  const [paymentMethods, setPaymentMethods] = useState<SavedPaymentMethod[]>(
+    [],
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      setUser(authUser)
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+      setUser(authUser);
 
       if (authUser) {
-        const response = await fetch("/api/payment-methods")
+        const response = await fetch("/api/payment-methods");
         if (response.ok) {
-          const methods = await response.json()
-          setPaymentMethods(methods)
+          const methods = await response.json();
+          setPaymentMethods(methods);
         }
       }
 
-      setIsLoading(false)
-    }
+      setIsLoading(false);
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const handlePaymentMethodAdded = async () => {
-    const response = await fetch("/api/payment-methods")
+    const response = await fetch("/api/payment-methods");
     if (response.ok) {
-      const methods = await response.json()
-      setPaymentMethods(methods)
+      const methods = await response.json();
+      setPaymentMethods(methods);
     }
-  }
+  };
 
   if (isLoading) {
-    return <div className="space-y-6">Loading...</div>
+    return <div className="space-y-6">Loading...</div>;
   }
 
   return (
@@ -56,7 +60,9 @@ export default function CustomerSettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-heading font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and security</p>
+        <p className="text-muted-foreground">
+          Manage your account and security
+        </p>
       </div>
 
       {/* Account Info */}
@@ -71,7 +77,9 @@ export default function CustomerSettingsPage() {
               <p className="text-base">{user?.email}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Last Sign In</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Last Sign In
+              </p>
               <p className="text-base">
                 {user?.last_sign_in_at
                   ? new Date(user.last_sign_in_at).toLocaleString()
@@ -107,7 +115,7 @@ export default function CustomerSettingsPage() {
               Keep your password secure and never share it with anyone.
             </AlertDescription>
           </Alert>
-          
+
           <div className="border-t pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -154,5 +162,5 @@ export default function CustomerSettingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

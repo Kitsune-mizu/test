@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { Loader2, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,12 +12,12 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 interface DeleteProductButtonProps {
-  productId: string
-  productName: string
-  onDeleteSuccess?: () => void
+  productId: string;
+  productName: string;
+  onDeleteSuccess?: () => void;
 }
 
 export function DeleteProductButton({
@@ -25,35 +25,35 @@ export function DeleteProductButton({
   productName,
   onDeleteSuccess,
 }: DeleteProductButtonProps) {
-  const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
       const res = await fetch(`/api/admin/products/${productId}`, {
         method: "DELETE",
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Failed to delete product")
-        return
+        toast.error(data.error || "Failed to delete product");
+        return;
       }
 
-      toast.success("Product deleted successfully")
-      setIsOpen(false)
-      onDeleteSuccess?.()
-      
+      toast.success("Product deleted successfully");
+      setIsOpen(false);
+      onDeleteSuccess?.();
+
       // Refresh the products list
-      router.refresh()
+      router.refresh();
     } catch (error) {
-      toast.error("An error occurred while deleting the product")
-      console.error("[v0] Delete error:", error)
+      toast.error("An error occurred while deleting the product");
+      console.error("[v0] Delete error:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
   }
 
@@ -72,7 +72,11 @@ export function DeleteProductButton({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Product</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{productName}"</span>? This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-foreground">
+                "{productName}"
+              </span>
+              ? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-3 justify-end">
@@ -95,5 +99,5 @@ export function DeleteProductButton({
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

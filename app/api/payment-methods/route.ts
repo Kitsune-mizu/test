@@ -1,13 +1,15 @@
-import { createClient } from "@/lib/supabase/server"
-import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -15,30 +17,37 @@ export async function GET(request: Request) {
       .from("saved_payment_methods")
       .select("*")
       .eq("user_id", user.id)
-      .order("is_default", { ascending: false })
+      .order("is_default", { ascending: false });
 
-    if (error) throw error
+    if (error) throw error;
 
-    return NextResponse.json(data)
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch payment methods" },
-      { status: 500 }
-    )
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch payment methods",
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const body = await request.json()
+    const body = await request.json();
     const {
       method_type,
       card_number,
@@ -46,14 +55,14 @@ export async function POST(request: Request) {
       card_brand,
       expiry_date,
       is_default,
-    } = body
+    } = body;
 
     // Validate input
     if (!method_type || !card_number || !card_holder) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // If setting as default, unset other defaults
@@ -61,7 +70,7 @@ export async function POST(request: Request) {
       await supabase
         .from("saved_payment_methods")
         .update({ is_default: false })
-        .eq("user_id", user.id)
+        .eq("user_id", user.id);
     }
 
     const { data, error } = await supabase
@@ -79,15 +88,20 @@ export async function POST(request: Request) {
         },
       ])
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
+    if (error) throw error;
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create payment method" },
-      { status: 500 }
-    )
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to create payment method",
+      },
+      { status: 500 },
+    );
   }
 }

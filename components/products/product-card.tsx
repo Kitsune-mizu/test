@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Heart, ShoppingCart, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import type { Product } from "@/lib/types"
-import { formatPrice } from "@/lib/format"
+import Image from "next/image";
+import Link from "next/link";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { Product } from "@/lib/types";
+import { formatPrice } from "@/lib/format";
 
 interface ProductCardProps {
-  product: Product
-  onAddToCart?: (productId: string) => void
-  onToggleWishlist?: (productId: string) => void
-  isInWishlist?: boolean
-  showActions?: boolean
+  product: Product;
+  onAddToCart?: (productId: string) => void;
+  onToggleWishlist?: (productId: string) => void;
+  isInWishlist?: boolean;
+  showActions?: boolean;
 }
 
 export function ProductCard({
@@ -23,7 +23,7 @@ export function ProductCard({
   isInWishlist = false,
   showActions = true,
 }: ProductCardProps) {
-  const isOutOfStock = product.stock === 0
+  const isOutOfStock = product.stock === 0;
 
   return (
     <div className="group relative bg-white">
@@ -44,7 +44,7 @@ export function ProductCard({
             </div>
           )}
         </Link>
-        
+
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {isOutOfStock && (
@@ -68,8 +68,8 @@ export function ProductCard({
                 size="sm"
                 disabled={isOutOfStock}
                 onClick={(e) => {
-                  e.preventDefault()
-                  onAddToCart(product.id)
+                  e.preventDefault();
+                  onAddToCart(product.id);
                 }}
                 className="flex-1 bg-black text-white hover:bg-neutral-800 text-xs h-9"
               >
@@ -93,8 +93,8 @@ export function ProductCard({
                 size="icon"
                 className="bg-white hover:bg-neutral-100 h-9 w-9"
                 onClick={(e) => {
-                  e.preventDefault()
-                  onToggleWishlist(product.id)
+                  e.preventDefault();
+                  onToggleWishlist(product.id);
                 }}
               >
                 <Heart
@@ -114,7 +114,9 @@ export function ProductCard({
         {/* Category & Brand */}
         <div className="flex items-center gap-2 text-[11px] text-neutral-500 uppercase tracking-wider">
           {product.brand && <span>{product.brand}</span>}
-          {product.brand && product.category && <span className="text-neutral-300">|</span>}
+          {product.brand && product.category && (
+            <span className="text-neutral-300">|</span>
+          )}
           {product.category && <span>{product.category}</span>}
         </div>
 
@@ -136,8 +138,8 @@ export function ProductCard({
         <button
           className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity"
           onClick={(e) => {
-            e.preventDefault()
-            onToggleWishlist(product.id)
+            e.preventDefault();
+            onToggleWishlist(product.id);
           }}
         >
           <Heart
@@ -149,5 +151,5 @@ export function ProductCard({
         </button>
       )}
     </div>
-  )
+  );
 }

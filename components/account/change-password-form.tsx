@@ -1,90 +1,98 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "sonner"
-import { Loader2, Eye, EyeOff } from "lucide-react"
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { toast } from "sonner";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export function ChangePasswordForm() {
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validate
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error("All fields are required")
-      return
+      toast.error("All fields are required");
+      return;
     }
 
     if (newPassword.length < 8) {
-      toast.error("New password must be at least 8 characters")
-      return
+      toast.error("New password must be at least 8 characters");
+      return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
-      return
+      toast.error("Passwords do not match");
+      return;
     }
 
     if (currentPassword === newPassword) {
-      toast.error("New password must be different from current password")
-      return
+      toast.error("New password must be different from current password");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const supabase = createClient()
+      const supabase = createClient();
 
       // First, verify the current password by attempting to sign in
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user?.email) {
-        toast.error("Unable to verify identity")
-        return
+        toast.error("Unable to verify identity");
+        return;
       }
 
       // Attempt to sign in with current password to verify
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email,
         password: currentPassword,
-      })
+      });
 
       if (signInError) {
-        toast.error("Current password is incorrect")
-        setIsLoading(false)
-        return
+        toast.error("Current password is incorrect");
+        setIsLoading(false);
+        return;
       }
 
       // Update password
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
-      })
+      });
 
       if (updateError) {
-        toast.error(updateError.message)
-        setIsLoading(false)
-        return
+        toast.error(updateError.message);
+        setIsLoading(false);
+        return;
       }
 
-      toast.success("Password changed successfully")
-      setCurrentPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
+      toast.success("Password changed successfully");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
-      console.error("[v0] Password change error:", error)
-      toast.error("An error occurred while changing password")
+      console.error("[v0] Password change error:", error);
+      toast.error("An error occurred while changing password");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -97,7 +105,10 @@ export function ChangePasswordForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
           <div className="space-y-2">
-            <Label htmlFor="current-password" className="text-sm font-medium text-black">
+            <Label
+              htmlFor="current-password"
+              className="text-sm font-medium text-black"
+            >
               Current Password
             </Label>
             <div className="relative">
@@ -125,7 +136,10 @@ export function ChangePasswordForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="new-password" className="text-sm font-medium text-black">
+            <Label
+              htmlFor="new-password"
+              className="text-sm font-medium text-black"
+            >
               New Password
             </Label>
             <div className="relative">
@@ -153,7 +167,10 @@ export function ChangePasswordForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm-password" className="text-sm font-medium text-black">
+            <Label
+              htmlFor="confirm-password"
+              className="text-sm font-medium text-black"
+            >
               Confirm New Password
             </Label>
             <div className="relative">
@@ -180,8 +197,8 @@ export function ChangePasswordForm() {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full h-11 bg-black text-white hover:bg-neutral-800"
             disabled={isLoading}
           >
@@ -197,5 +214,5 @@ export function ChangePasswordForm() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

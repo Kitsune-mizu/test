@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const results = {
     migrations_run: [] as string[],
     errors: [] as string[],
-  }
+  };
 
   // Migration 1: Extend products table
   try {
@@ -19,12 +19,12 @@ export async function POST() {
         
         CREATE INDEX IF NOT EXISTS idx_products_tax_rate ON public.products(tax_rate);
       `,
-    })
-    results.migrations_run.push("Products table extended")
+    });
+    results.migrations_run.push("Products table extended");
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
+    const errorMsg = error instanceof Error ? error.message : String(error);
     if (!errorMsg.includes("does not exist")) {
-      results.errors.push(`Products migration: ${errorMsg}`)
+      results.errors.push(`Products migration: ${errorMsg}`);
     }
   }
 
@@ -76,12 +76,12 @@ export async function POST() {
         FOR DELETE
         USING (auth.uid() = user_id);
       `,
-    })
-    results.migrations_run.push("Payment methods table created")
+    });
+    results.migrations_run.push("Payment methods table created");
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
+    const errorMsg = error instanceof Error ? error.message : String(error);
     if (!errorMsg.includes("does not exist")) {
-      results.errors.push(`Payment methods migration: ${errorMsg}`)
+      results.errors.push(`Payment methods migration: ${errorMsg}`);
     }
   }
 
@@ -97,12 +97,12 @@ export async function POST() {
         CREATE INDEX IF NOT EXISTS idx_orders_order_number ON public.orders(order_number);
         CREATE INDEX IF NOT EXISTS idx_orders_processed_at ON public.orders(processed_at);
       `,
-    })
-    results.migrations_run.push("Orders table extended")
+    });
+    results.migrations_run.push("Orders table extended");
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
+    const errorMsg = error instanceof Error ? error.message : String(error);
     if (!errorMsg.includes("does not exist")) {
-      results.errors.push(`Orders migration: ${errorMsg}`)
+      results.errors.push(`Orders migration: ${errorMsg}`);
     }
   }
 
@@ -110,5 +110,5 @@ export async function POST() {
     success: results.errors.length === 0,
     migrations_run: results.migrations_run,
     errors: results.errors,
-  })
+  });
 }

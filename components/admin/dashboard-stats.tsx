@@ -1,43 +1,43 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Package, ShoppingCart, TrendingUp, AlertCircle } from 'lucide-react'
-import { formatPrice } from '@/lib/format'
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Package, ShoppingCart, TrendingUp, AlertCircle } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 
 interface DashboardStats {
-  productsCount: number
-  ordersCount: number
-  totalRevenue: number
-  lowStockCount: number
+  productsCount: number;
+  ordersCount: number;
+  totalRevenue: number;
+  lowStockCount: number;
 }
 
 export function DashboardStats() {
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch('/api/admin/dashboard/stats')
-        if (!response.ok) throw new Error('Failed to fetch stats')
-        const data = await response.json()
-        setStats(data)
+        setIsLoading(true);
+        const response = await fetch("/api/admin/dashboard/stats");
+        if (!response.ok) throw new Error("Failed to fetch stats");
+        const data = await response.json();
+        setStats(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error')
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchStats()
-  }, [])
+    fetchStats();
+  }, []);
 
   if (error) {
-    return <div className="text-destructive">Error loading stats: {error}</div>
+    return <div className="text-destructive">Error loading stats: {error}</div>;
   }
 
   return (
@@ -56,7 +56,9 @@ export function DashboardStats() {
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold">{stats?.productsCount || 0}</div>
+              <div className="text-2xl font-bold">
+                {stats?.productsCount || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Active products</p>
             </>
           )}
@@ -77,7 +79,9 @@ export function DashboardStats() {
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold">{stats?.ordersCount || 0}</div>
+              <div className="text-2xl font-bold">
+                {stats?.ordersCount || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Delivered orders</p>
             </>
           )}
@@ -98,7 +102,9 @@ export function DashboardStats() {
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold">{formatPrice(stats?.totalRevenue || 0)}</div>
+              <div className="text-2xl font-bold">
+                {formatPrice(stats?.totalRevenue || 0)}
+              </div>
               <p className="text-xs text-muted-foreground">Total earned</p>
             </>
           )}
@@ -119,12 +125,14 @@ export function DashboardStats() {
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold">{stats?.lowStockCount || 0}</div>
+              <div className="text-2xl font-bold">
+                {stats?.lowStockCount || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Need restock</p>
             </>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

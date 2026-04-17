@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { RealtimeOrdersTable } from '@/components/admin/realtime-orders-table'
+import { RealtimeOrdersTable } from "@/components/admin/realtime-orders-table";
 
 export default function AdminOrdersPage() {
   return (
@@ -8,11 +8,13 @@ export default function AdminOrdersPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-heading font-bold">Orders</h1>
-        <p className="text-muted-foreground">Manage customer orders with live updates</p>
+        <p className="text-muted-foreground">
+          Manage customer orders with live updates
+        </p>
       </div>
 
       {/* Real-time Orders Table */}
       <RealtimeOrdersTable />
     </div>
-  )
+  );
 }

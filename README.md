@@ -5,6 +5,7 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 ## 🏔️ Branding
 
 **Hikaru Bouken** (光る冒険) means "Shining Adventure" in Japanese. The platform features:
+
 - **Color Scheme**: Black (#000000), White (#FFFFFF), Red Accent (#E10600)
 - **Japanese Elements**: 冒険 (Adventure), 山 (Mountain), 道 (Path), 旅 (Journey)
 - **Design**: Modern, minimal, high-end outdoor gear aesthetic
@@ -12,6 +13,7 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 ## 🎯 Features
 
 ### Customer Features
+
 - 🛍️ **Browse Products** - Grid-based product browsing with filters
 - 🛒 **Shopping Cart** - Add/remove items, manage quantities
 - ❤️ **Wishlist** - Save favorite products for later
@@ -21,6 +23,7 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 - 👤 **User Account** - Profile management, address book, order history
 
 ### Admin Features
+
 - 📊 **Dashboard** - Real-time analytics and store overview
 - 📦 **Product Management** - CRUD operations for products
 - 📋 **Order Management** - View, update, and manage orders
@@ -30,6 +33,7 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 - ⚙️ **Settings** - Admin account and security settings
 
 ### Core Functionalities
+
 - 🔐 **Authentication** - Supabase Auth with role-based access
 - 💾 **Database** - PostgreSQL with row-level security
 - 🔒 **Authorization** - Admin and customer role separation
@@ -40,6 +44,7 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Next.js 16** - React framework with App Router
 - **React 19.2** - UI library
 - **Tailwind CSS 4** - Utility-first CSS
@@ -47,23 +52,26 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 - **TypeScript** - Type-safe development
 
 ### Backend
+
 - **Next.js API Routes** - RESTful endpoints
 - **Server Actions** - Form submissions and mutations
 - **Middleware** - Session and authentication
 
 ### Database & Auth
+
 - **Supabase** - PostgreSQL database
 - **Supabase Auth** - Email/password authentication
 - **Row Level Security (RLS)** - Data access control
 
 ### Additional Tools
+
 - **Sonner** - Toast notifications
 - **Lucide React** - Icons
 - **Zod** - Schema validation
 
 ## 📁 Project Structure
 
-``` 
+```
 app/
 ├── admin/                    # Admin dashboard
 │   ├── layout.tsx           # Admin layout with sidebar
@@ -129,6 +137,7 @@ components/
 ## 🗄️ Database Schema
 
 ### Users
+
 ```sql
 - id (UUID)
 - name (TEXT)
@@ -140,6 +149,7 @@ components/
 ```
 
 ### Products
+
 ```sql
 - id (UUID)
 - name (TEXT)
@@ -155,6 +165,7 @@ components/
 ```
 
 ### Orders
+
 ```sql
 - id (UUID)
 - user_id (UUID) - FK to users
@@ -167,6 +178,7 @@ components/
 ```
 
 ### Order Items
+
 ```sql
 - id (UUID)
 - order_id (UUID) - FK to orders
@@ -176,6 +188,7 @@ components/
 ```
 
 ### Cart
+
 ```sql
 - id (UUID)
 - user_id (UUID) - FK to users
@@ -185,6 +198,7 @@ components/
 ```
 
 ### Wishlist
+
 ```sql
 - id (UUID)
 - user_id (UUID) - FK to users
@@ -193,6 +207,7 @@ components/
 ```
 
 ### Reviews
+
 ```sql
 - id (UUID)
 - user_id (UUID) - FK to users
@@ -204,6 +219,7 @@ components/
 ```
 
 ### Notifications
+
 ```sql
 - id (UUID)
 - user_id (UUID) - FK to users
@@ -217,6 +233,7 @@ components/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Supabase account
 - Git
@@ -224,6 +241,7 @@ components/
 ### Installation
 
 1. **Clone & Install**
+
    ```bash
    git clone <repository>
    cd hikaru-bouken
@@ -232,6 +250,7 @@ components/
 
 2. **Environment Setup**
    - Create `.env.local`:
+
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
@@ -251,16 +270,19 @@ components/
 ### Demo Credentials
 
 **Customer Login:**
+
 - Email: `customer@example.com`
 - Password: `demo123456`
 
 **Admin Login:**
+
 - Email: `admin@example.com`
 - Password: `admin123456`
 
 ## 📍 Key Routes
 
 ### Customer Routes
+
 - `/` - Homepage
 - `/products` - Product listing
 - `/products/[slug]` - Product detail
@@ -273,6 +295,7 @@ components/
 - `/account/wishlist` - Wishlist
 
 ### Admin Routes
+
 - `/admin/auth/login` - Admin login (hidden, must type manually)
 - `/admin/dashboard` - Dashboard
 - `/admin/products` - Product management
@@ -284,6 +307,7 @@ components/
 - `/admin/settings` - Admin settings
 
 ### API Routes
+
 - `POST /api/products` - Create product
 - `GET /api/products` - List products (with filters)
 - `PATCH /api/products/[id]` - Update product
@@ -312,17 +336,20 @@ components/
 ## 🎨 Design System
 
 ### Colors
+
 - **Primary**: #E10600 (Red accent)
 - **Background**: #FFFFFF (Light) / #000000 (Dark)
 - **Foreground**: #000000 (Light) / #FFFFFF (Dark)
 - **Border**: #E5E5E5 (Light) / #333333 (Dark)
 
 ### Typography
+
 - **Headings**: Outfit font
 - **Body**: Inter font
 - **Mono**: Geist Mono
 
 ### Components
+
 - Card-based layouts
 - Grid systems
 - Hover animations
@@ -332,6 +359,7 @@ components/
 ## 🧪 Testing
 
 Visit `/api/seed/products` (as admin) to populate demo data:
+
 ```bash
 POST /api/seed/products
 ```
@@ -350,6 +378,7 @@ This will add 10 sample outdoor gear products with images and details.
 ## 🎓 Learning Resources
 
 This project demonstrates:
+
 - Next.js 16 App Router patterns
 - Supabase authentication & RLS
 - TypeScript best practices
@@ -368,6 +397,7 @@ University Project - Educational Purpose Only
 ## 🤝 Support
 
 For issues or questions:
+
 1. Check the documentation
 2. Review Supabase setup
 3. Verify environment variables
@@ -381,5 +411,6 @@ For issues or questions:
 #   H i B 
  
  # HiB
-#   t e s t  
+#   t e s t 
+ 
  

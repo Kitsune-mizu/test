@@ -1,26 +1,27 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Shield, Lock } from "lucide-react"
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Shield, Lock } from "lucide-react";
 
 async function handleAdminLogin(formData: FormData) {
-  "use server"
+  "use server";
 
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
   if (authError || !authData.user) {
-    redirect("/panel/login?error=invalid")
+    redirect("/panel/login?error=invalid");
   }
 
   // Check if user has admin role
@@ -28,51 +29,56 @@ async function handleAdminLogin(formData: FormData) {
     .from("users")
     .select("role")
     .eq("id", authData.user.id)
-    .single()
+    .single();
 
-  const isAdmin = userProfile?.role === "admin" || authData.user.user_metadata?.role === "admin"
+  const isAdmin =
+    userProfile?.role === "admin" ||
+    authData.user.user_metadata?.role === "admin";
 
   if (!isAdmin) {
-    await supabase.auth.signOut()
-    redirect("/panel/login?error=unauthorized")
+    await supabase.auth.signOut();
+    redirect("/panel/login?error=unauthorized");
   }
 
-  redirect("/admin/dashboard")
+  redirect("/admin/dashboard");
 }
 
 export default async function AdminPanelLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const params = await searchParams
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const params = await searchParams;
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (user) {
     const { data: userProfile } = await supabase
       .from("users")
       .select("role")
       .eq("id", user.id)
-      .single()
-    
+      .single();
+
     if (userProfile?.role === "admin" || user.user_metadata?.role === "admin") {
-      redirect("/admin/dashboard")
+      redirect("/admin/dashboard");
     }
   }
 
-  const errorMessage = params.error === "invalid" 
-    ? "Invalid email or password" 
-    : params.error === "unauthorized" 
-    ? "You are not authorized to access admin panel" 
-    : null
+  const errorMessage =
+    params.error === "invalid"
+      ? "Invalid email or password"
+      : params.error === "unauthorized"
+        ? "You are not authorized to access admin panel"
+        : null;
 
   return (
     <div className="flex min-h-screen bg-black">
       <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
-        <span 
-          className="absolute -right-32 top-1/2 -translate-y-1/2 text-[500px] font-heading font-bold text-white/[0.02] leading-none select-none pointer-events-none" 
+        <span
+          className="absolute -right-32 top-1/2 -translate-y-1/2 text-[500px] font-heading font-bold text-white/[0.02] leading-none select-none pointer-events-none"
           aria-hidden="true"
         >
           管
@@ -81,7 +87,9 @@ export default async function AdminPanelLoginPage({
         <div className="w-full max-w-md relative z-10">
           <div className="mb-12 flex flex-col items-center text-center">
             <div className="relative flex h-16 w-16 items-center justify-center bg-white mb-4">
-              <span className="text-3xl font-bold text-black font-heading">光</span>
+              <span className="text-3xl font-bold text-black font-heading">
+                光
+              </span>
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#E10600]" />
             </div>
             <div className="flex flex-col items-center">
@@ -96,7 +104,9 @@ export default async function AdminPanelLoginPage({
 
           <div className="flex items-center justify-center gap-2 mb-8 text-neutral-400">
             <Shield className="h-4 w-4" />
-            <span className="text-sm font-medium tracking-wide uppercase">Admin Access Only</span>
+            <span className="text-sm font-medium tracking-wide uppercase">
+              Admin Access Only
+            </span>
           </div>
 
           {errorMessage && (
@@ -107,7 +117,10 @@ export default async function AdminPanelLoginPage({
 
           <form action={handleAdminLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-neutral-300">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-neutral-300"
+              >
                 Email Address
               </Label>
               <Input
@@ -121,7 +134,10 @@ export default async function AdminPanelLoginPage({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-neutral-300">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-neutral-300"
+              >
                 Password
               </Label>
               <Input
@@ -134,8 +150,8 @@ export default async function AdminPanelLoginPage({
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full h-12 bg-white text-black hover:bg-neutral-200 font-medium"
             >
               <Lock className="h-4 w-4 mr-2" />
@@ -151,8 +167,8 @@ export default async function AdminPanelLoginPage({
           </div>
 
           <div className="mt-6 text-center">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-sm text-neutral-500 hover:text-white transition-colors"
             >
               Back to Store
@@ -165,5 +181,5 @@ export default async function AdminPanelLoginPage({
         </div>
       </div>
     </div>
-  )
+  );
 }

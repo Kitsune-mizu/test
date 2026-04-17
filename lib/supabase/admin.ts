@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
 // ⚠️ HANYA untuk server-side admin operations
 // JANGAN pernah digunakan di client components
@@ -11,6 +11,6 @@ export function createAdminClient() {
         autoRefreshToken: false,
         persistSession: false,
       },
-    }
-  )
+    },
+  );
 }

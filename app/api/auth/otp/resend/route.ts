@@ -1,53 +1,55 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { generateOTP } from '@/lib/otp'
-import { Resend } from 'resend'
+import { NextRequest, NextResponse } from "next/server";
+import { generateOTP } from "@/lib/otp";
+import { Resend } from "resend";
 
 // Initialize Resend if API key is available
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email } = body
+    const body = await request.json();
+    const { email } = body;
 
     // Validate input
     if (!email) {
       return NextResponse.json(
-        { success: false, error: 'Email is required' },
-        { status: 400 }
-      )
+        { success: false, error: "Email is required" },
+        { status: 400 },
+      );
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid email format' },
-        { status: 400 }
-      )
+        { success: false, error: "Invalid email format" },
+        { status: 400 },
+      );
     }
 
     // Generate new OTP
-    const result = await generateOTP(email)
+    const result = await generateOTP(email);
 
     if (!result.success) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: result.error,
-          cooldownRemaining: result.cooldownRemaining
+          cooldownRemaining: result.cooldownRemaining,
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Send email with OTP
     if (resend && result.code) {
       try {
         await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'noreply@hikarubouken.com',
+          from: process.env.RESEND_FROM_EMAIL || "noreply@hikarubouken.com",
           to: email,
-          subject: 'Your Verification Code - Hikaru Bouken',
+          subject: "Your Verification Code - Hikaru Bouken",
           html: `
             <!DOCTYPE html>
             <html>
@@ -135,23 +137,23 @@ export async function POST(request: NextRequest) {
               </body>
             </html>
           `,
-        })
+        });
       } catch (emailError) {
-        console.error('Failed to send verification email:', emailError)
+        console.error("Failed to send verification email:", emailError);
         // Don't fail the request if email fails - code is still generated
         // In production, you'd want to handle this more gracefully
       }
     } else {
       // Log code for development (remove in production)
-      console.log(`[DEV] OTP for ${email}: ${result.code}`)
+      console.log(`[DEV] OTP for ${email}: ${result.code}`);
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('OTP resend error:', error)
+    console.error("OTP resend error:", error);
     return NextResponse.json(
-      { success: false, error: 'An unexpected error occurred' },
-      { status: 500 }
-    )
+      { success: false, error: "An unexpected error occurred" },
+      { status: 500 },
+    );
   }
 }

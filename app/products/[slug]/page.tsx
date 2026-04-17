@@ -1,61 +1,63 @@
-import { notFound } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
-import { ProductDetails } from "@/components/products/product-details"
-import { ProductReviews } from "@/components/products/product-reviews"
-import { RelatedProducts } from "@/components/products/related-products"
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { ProductDetails } from "@/components/products/product-details";
+import { ProductReviews } from "@/components/products/product-reviews";
+import { RelatedProducts } from "@/components/products/related-products";
 
 interface ProductPageProps {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const { slug } = await params
-  const supabase = await createClient()
-  
+  const { slug } = await params;
+  const supabase = await createClient();
+
   const { data: product } = await supabase
     .from("products")
     .select("name, description")
     .eq("slug", slug)
-    .single()
+    .single();
 
   if (!product) {
-    return { title: "Product Not Found" }
+    return { title: "Product Not Found" };
   }
 
   return {
     title: `${product.name} | Hikaru Bouken`,
     description: product.description || `Shop ${product.name} at Hikaru Bouken`,
-  }
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params
-  const supabase = await createClient()
+  const { slug } = await params;
+  const supabase = await createClient();
 
   // Get current user
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  let user = null
-  let cartCount = 0
-  let isInWishlist = false
+  let user = null;
+  let cartCount = 0;
+  let isInWishlist = false;
 
   if (authUser) {
     const { data: userProfile } = await supabase
       .from("users")
       .select("id, name, role")
       .eq("id", authUser.id)
-      .single()
+      .single();
 
-    user = userProfile
+    user = userProfile;
 
     const { count } = await supabase
       .from("cart")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", authUser.id)
+      .eq("user_id", authUser.id);
 
-    cartCount = count || 0
+    cartCount = count || 0;
   }
 
   // Get product
@@ -63,10 +65,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .from("products")
     .select("*")
     .eq("slug", slug)
-    .single()
+    .single();
 
   if (!product) {
-    notFound()
+    notFound();
   }
 
   // Check if in wishlist
@@ -76,20 +78,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
       .select("id")
       .eq("user_id", authUser.id)
       .eq("product_id", product.id)
-      .single()
+      .single();
 
-    isInWishlist = !!wishlistItem
+    isInWishlist = !!wishlistItem;
   }
 
   // Get reviews
   const { data: reviews } = await supabase
     .from("reviews")
-    .select(`
+    .select(
+      `
       *,
       users:user_id (id, name)
-    `)
+    `,
+    )
     .eq("product_id", product.id)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: false });
 
   // Get related products (same category)
   const { data: relatedProducts } = await supabase
@@ -97,7 +101,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .select("*")
     .eq("category", product.category)
     .neq("id", product.id)
-    .limit(4)
+    .limit(4);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -109,7 +113,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             isInWishlist={isInWishlist}
             isLoggedIn={!!authUser}
           />
-          
+
           <div className="mt-16">
             <ProductReviews
               productId={product.id}
@@ -127,5 +131,5 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

@@ -1,32 +1,38 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
-import { formatPrice } from "@/lib/format"
-import { ShieldCheck, Lock, Zap } from "lucide-react"
+import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { formatPrice } from "@/lib/format";
+import { ShieldCheck, Lock, Zap } from "lucide-react";
 
 interface OrderItem {
-  id: string
-  quantity: number
+  id: string;
+  quantity: number;
   products: {
-    id: string
-    name: string
-    slug: string
-    price: number
-    image_url: string | null
-  } | null
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    image_url: string | null;
+  } | null;
 }
 
 interface OrderSummaryProps {
-  items: OrderItem[]
-  subtotal: number
-  shipping: number
-  total: number
-  isDemoMode?: boolean
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  isDemoMode?: boolean;
 }
 
-export function OrderSummary({ items, subtotal, shipping, total, isDemoMode }: OrderSummaryProps) {
+export function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  total,
+  isDemoMode,
+}: OrderSummaryProps) {
   return (
     <Card className="sticky top-24">
       <CardHeader>
@@ -44,8 +50,8 @@ export function OrderSummary({ items, subtotal, shipping, total, isDemoMode }: O
         {/* Items */}
         <div className="space-y-3 max-h-64 overflow-y-auto">
           {items.map((item) => {
-            if (!item.products) return null
-            const product = item.products
+            if (!item.products) return null;
+            const product = item.products;
 
             return (
               <div key={item.id} className="flex gap-3">
@@ -71,13 +77,15 @@ export function OrderSummary({ items, subtotal, shipping, total, isDemoMode }: O
                   >
                     {product.name}
                   </Link>
-                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Qty: {item.quantity}
+                  </p>
                   <p className="text-sm font-medium">
                     {formatPrice(product.price * item.quantity)}
                   </p>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
 
@@ -115,5 +123,5 @@ export function OrderSummary({ items, subtotal, shipping, total, isDemoMode }: O
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

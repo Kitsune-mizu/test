@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { toast } from "sonner"
-import { createOrderAction } from "@/app/actions/orders"
-import { validateStock } from "@/lib/helpers/stock-helpers"
-import { checkRateLimit } from "@/lib/helpers/security-helpers"
-import { CreditCard, Truck, Loader2, AlertCircle } from "lucide-react"
-import type { User } from "@/lib/types"
-import { isDemoAccount, DEMO_CARDS } from "@/lib/demo"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
+import { createOrderAction } from "@/app/actions/orders";
+import { validateStock } from "@/lib/helpers/stock-helpers";
+import { checkRateLimit } from "@/lib/helpers/security-helpers";
+import { CreditCard, Truck, Loader2, AlertCircle } from "lucide-react";
+import type { User } from "@/lib/types";
+import { isDemoAccount, DEMO_CARDS } from "@/lib/demo";
 
 interface CartItem {
-  id: string
-  quantity: number
-  product_id: string
+  id: string;
+  quantity: number;
+  product_id: string;
   products: {
-    id: string
-    price: number
-  } | null
+    id: string;
+    price: number;
+  } | null;
 }
 
 interface CheckoutFormProps {
-  user: User | null
-  cartItems: CartItem[]
-  total: number
+  user: User | null;
+  cartItems: CartItem[];
+  total: number;
 }
 
 export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const isDemoMode = isDemoAccount(user?.email)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isDemoMode = isDemoAccount(user?.email);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -45,33 +45,33 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
     address: user?.address || "",
     paymentMethod: "card",
     shippingMethod: "standard",
-  })
+  });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.name || !formData.email || !formData.address) {
-      toast.error("Please fill in all required fields")
-      return
+      toast.error("Please fill in all required fields");
+      return;
     }
 
     // Rate limit checkout attempts
-    const rateLimitCheck = await checkRateLimit('checkout')
+    const rateLimitCheck = await checkRateLimit("checkout");
     if (!rateLimitCheck.allowed) {
-      toast.error("Too many checkout attempts. Please try again later.")
-      return
+      toast.error("Too many checkout attempts. Please try again later.");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Prepare order items
     const orderItems = cartItems
@@ -80,21 +80,27 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
         product_id: item.product_id,
         quantity: item.quantity,
         price: item.products!.price,
-      }))
+      }));
 
     // Validate stock before processing order
-    const stockValidation = await validateStock(orderItems)
+    const stockValidation = await validateStock(orderItems);
     if (!stockValidation.isValid) {
-      if (stockValidation.insufficientItems && stockValidation.insufficientItems.length > 0) {
+      if (
+        stockValidation.insufficientItems &&
+        stockValidation.insufficientItems.length > 0
+      ) {
         const itemsList = stockValidation.insufficientItems
-          .map((item) => `${item.productName} (requested: ${item.requested}, available: ${item.available})`)
-          .join(", ")
-        toast.error(`Out of stock: ${itemsList}`)
+          .map(
+            (item) =>
+              `${item.productName} (requested: ${item.requested}, available: ${item.available})`,
+          )
+          .join(", ");
+        toast.error(`Out of stock: ${itemsList}`);
       } else {
-        toast.error(stockValidation.message || "Stock validation failed")
+        toast.error(stockValidation.message || "Stock validation failed");
       }
-      setIsSubmitting(false)
-      return
+      setIsSubmitting(false);
+      return;
     }
 
     const result = await createOrderAction({
@@ -103,17 +109,17 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
       shippingMethod: formData.shippingMethod,
       shippingAddress: `${formData.name}\n${formData.address}\n${formData.phone}`,
       items: orderItems,
-    })
+    });
 
     if (result.error) {
-      toast.error(result.error)
-      setIsSubmitting(false)
+      toast.error(result.error);
+      setIsSubmitting(false);
     } else {
-      toast.success("Order placed successfully!")
+      toast.success("Order placed successfully!");
       // Redirect to success page
-      router.push(`/checkout/success?orderId=${result.orderId}`)
+      router.push(`/checkout/success?orderId=${result.orderId}`);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -123,10 +129,21 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
           <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-blue-900">Test Mode Active</p>
-            <p className="text-sm text-blue-700 mt-1">No real payment will be charged. Use the test card below to complete checkout.</p>
+            <p className="text-sm text-blue-700 mt-1">
+              No real payment will be charged. Use the test card below to
+              complete checkout.
+            </p>
             <div className="mt-3 bg-white rounded p-3 border border-blue-100 text-sm font-mono">
-              <p className="text-gray-600">Card: <span className="text-black">{DEMO_CARDS.success.number}</span></p>
-              <p className="text-gray-600">Exp: <span className="text-black">{DEMO_CARDS.success.expiry}</span> CVC: <span className="text-black">{DEMO_CARDS.success.cvc}</span></p>
+              <p className="text-gray-600">
+                Card:{" "}
+                <span className="text-black">{DEMO_CARDS.success.number}</span>
+              </p>
+              <p className="text-gray-600">
+                Exp:{" "}
+                <span className="text-black">{DEMO_CARDS.success.expiry}</span>{" "}
+                CVC:{" "}
+                <span className="text-black">{DEMO_CARDS.success.cvc}</span>
+              </p>
             </div>
           </div>
         </div>
@@ -208,7 +225,10 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
             className="space-y-3"
           >
             {["DHL", "JNE", "J&T", "FedEx"].map((courier) => (
-              <div key={courier} className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+              <div
+                key={courier}
+                className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+              >
                 <RadioGroupItem value={courier.toLowerCase()} id={courier} />
                 <Label htmlFor={courier} className="flex-1 cursor-pointer">
                   <div className="flex items-center justify-between">
@@ -216,7 +236,9 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
                       <Truck className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">{courier}</p>
-                        <p className="text-sm text-muted-foreground">Fast and reliable delivery</p>
+                        <p className="text-sm text-muted-foreground">
+                          Fast and reliable delivery
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -248,8 +270,8 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
                   <div>
                     <p className="font-medium">Credit / Debit Card</p>
                     <p className="text-sm text-muted-foreground">
-                      {isDemoMode 
-                        ? "Use test card from above" 
+                      {isDemoMode
+                        ? "Use test card from above"
                         : "Pay securely with your card"}
                     </p>
                   </div>
@@ -263,7 +285,9 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
                   <Truck className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">Cash on Delivery</p>
-                    <p className="text-sm text-muted-foreground">Pay when you receive your order</p>
+                    <p className="text-sm text-muted-foreground">
+                      Pay when you receive your order
+                    </p>
                   </div>
                 </div>
               </Label>
@@ -275,7 +299,12 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
       <Separator />
 
       {/* Submit */}
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -286,5 +315,5 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
         )}
       </Button>
     </form>
-  )
+  );
 }

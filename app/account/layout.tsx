@@ -1,20 +1,22 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
-import { AccountSidebar } from "@/components/account/account-sidebar"
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { AccountSidebar } from "@/components/account/account-sidebar";
 
 export default async function AccountLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
   if (!authUser) {
-    redirect("/auth/login?redirect=/account")
+    redirect("/auth/login?redirect=/account");
   }
 
   // Get user profile
@@ -22,13 +24,13 @@ export default async function AccountLayout({
     .from("users")
     .select("id, name, role")
     .eq("id", authUser.id)
-    .single()
+    .single();
 
   // Get cart count
   const { count: cartCount } = await supabase
     .from("cart")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", authUser.id)
+    .eq("user_id", authUser.id);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,5 +47,5 @@ export default async function AccountLayout({
       </main>
       <Footer />
     </div>
-  )
+  );
 }

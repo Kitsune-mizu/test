@@ -1,7 +1,7 @@
 // app/account/notifications/page.tsx
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bell } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bell } from "lucide-react";
 
 export default function CustomerNotificationsPage() {
   return (
@@ -19,9 +19,11 @@ export default function CustomerNotificationsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Notifications center coming soon...</p>
+          <p className="text-muted-foreground">
+            Notifications center coming soon...
+          </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

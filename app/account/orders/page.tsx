@@ -1,23 +1,26 @@
-import { createClient } from "@/lib/supabase/server"
-import { OrdersList } from "@/components/account/orders-list"
-import { isDemoAccount } from "@/lib/demo"
+import { createClient } from "@/lib/supabase/server";
+import { OrdersList } from "@/components/account/orders-list";
+import { isDemoAccount } from "@/lib/demo";
 
 export const metadata = {
   title: "My Orders | Hikaru Bouken",
   description: "View your order history",
-}
+};
 
 export default async function OrdersPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
   // Check if this is a demo account
-  const isDemoMode = isDemoAccount(authUser?.email)
+  const isDemoMode = isDemoAccount(authUser?.email);
 
   const { data: orders } = await supabase
     .from("orders")
-    .select(`
+    .select(
+      `
       *,
       order_items (
         id,
@@ -25,11 +28,10 @@ export default async function OrdersPage() {
         price,
         products (name, slug, image_url)
       )
-    `)
+    `,
+    )
     .eq("user_id", authUser!.id)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: false });
 
-  return (
-    <OrdersList orders={orders || []} isDemoMode={isDemoMode} />
-  )
+  return <OrdersList orders={orders || []} isDemoMode={isDemoMode} />;
 }

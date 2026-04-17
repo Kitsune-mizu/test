@@ -49,8 +49,6 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
         )
       )}
 
-  return (
-    <div>
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-8">
         <Link href="/" className="hover:text-primary transition-colors">Home</Link>
@@ -94,7 +92,6 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
 
         {/* Product Info */}
         <div className="flex flex-col">
-          {/* Brand & Category */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
             {product.brand && <span className="font-medium">{product.brand}</span>}
             {product.brand && product.category && <span>•</span>}
@@ -105,13 +102,9 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
             )}
           </div>
 
-          {/* Name */}
           <h1 className="font-heading text-3xl font-bold">{product.name}</h1>
-
-          {/* Price */}
           <p className="mt-4 text-3xl font-bold text-primary">{formatPrice(product.price)}</p>
 
-          {/* Stock Status */}
           <div className="mt-4">
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
@@ -126,14 +119,12 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
             )}
           </div>
 
-          {/* Description */}
           {product.description && (
             <p className="mt-6 text-muted-foreground leading-relaxed">
               {product.description}
             </p>
           )}
 
-          {/* Tags */}
           {product.tags && product.tags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {product.tags.map((tag) => (
@@ -146,56 +137,38 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
 
           <Separator className="my-6" />
 
-          {/* Quantity Selector */}
           {!isOutOfStock && (
             <div className="flex items-center gap-4 mb-6">
               <span className="text-sm font-medium">Quantity:</span>
               <div className="flex items-center border rounded-lg">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-r-none"
+                <Button variant="ghost" size="icon" className="h-10 w-10"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                >
+                  disabled={quantity <= 1}>
                   <Minus className="h-4 w-4" />
                 </Button>
                 <span className="w-12 text-center font-medium">{quantity}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-l-none"
+                <Button variant="ghost" size="icon" className="h-10 w-10"
                   onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
-                  disabled={quantity >= maxQuantity}
-                >
+                  disabled={quantity >= maxQuantity}>
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3">
-            <Button
-              size="lg"
-              className="flex-1 gap-2"
+            <Button size="lg" className="flex-1 gap-2"
               onClick={handleAddToCart}
-              disabled={isOutOfStock || cartLoading}
-            >
+              disabled={isOutOfStock || cartLoading}>
               <ShoppingCart className="h-5 w-5" />
               {isOutOfStock ? "Out of Stock" : "Add to Cart"}
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleToggleWishlist}
-            >
+
+            <Button size="lg" variant="outline" onClick={handleToggleWishlist}>
               <Heart className={`h-5 w-5 ${isWishlisted ? "fill-destructive text-destructive" : ""}`} />
-              <span className="sr-only">{isWishlisted ? "Remove from wishlist" : "Add to wishlist"}</span>
             </Button>
           </div>
 
-          {/* Features */}
           <div className="mt-8 grid gap-4">
             <div className="flex items-center gap-3 text-sm">
               <Truck className="h-5 w-5 text-primary" />

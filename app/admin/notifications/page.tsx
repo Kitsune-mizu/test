@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bell } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bell } from "lucide-react";
 
 export default function AdminNotificationsPage() {
   return (
@@ -17,9 +17,11 @@ export default function AdminNotificationsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Notifications center coming soon...</p>
+          <p className="text-muted-foreground">
+            Notifications center coming soon...
+          </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

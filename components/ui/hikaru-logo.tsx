@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface HikaruLogoProps {
-  size?: "sm" | "md" | "lg" | "xl"
-  variant?: "full" | "icon"
-  className?: string
+  size?: "sm" | "md" | "lg" | "xl";
+  variant?: "full" | "icon";
+  className?: string;
 }
 
 const sizeConfig = {
@@ -13,10 +13,14 @@ const sizeConfig = {
   md: { icon: "h-10 w-10", text: "text-xl", japanese: "text-xs" },
   lg: { icon: "h-12 w-12", text: "text-2xl", japanese: "text-sm" },
   xl: { icon: "h-16 w-16", text: "text-3xl", japanese: "text-base" },
-}
+};
 
-export function HikaruLogo({ size = "md", variant = "full", className }: HikaruLogoProps) {
-  const config = sizeConfig[size]
+export function HikaruLogo({
+  size = "md",
+  variant = "full",
+  className,
+}: HikaruLogoProps) {
+  const config = sizeConfig[size];
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
@@ -24,12 +28,24 @@ export function HikaruLogo({ size = "md", variant = "full", className }: HikaruL
       <div
         className={cn(
           "relative flex items-center justify-center bg-black text-white",
-          config.icon
+          config.icon,
         )}
         style={{ aspectRatio: "1" }}
       >
         {/* Main Japanese Character - 光 (Hikaru/Light) */}
-        <span className="font-heading font-bold text-white" style={{ fontSize: size === "sm" ? "16px" : size === "md" ? "20px" : size === "lg" ? "24px" : "32px" }}>
+        <span
+          className="font-heading font-bold text-white"
+          style={{
+            fontSize:
+              size === "sm"
+                ? "16px"
+                : size === "md"
+                  ? "20px"
+                  : size === "lg"
+                    ? "24px"
+                    : "32px",
+          }}
+        >
           光
         </span>
         {/* Red Accent Line */}
@@ -39,16 +55,26 @@ export function HikaruLogo({ size = "md", variant = "full", className }: HikaruL
       {/* Full Logo Text */}
       {variant === "full" && (
         <div className="flex flex-col">
-          <span className={cn("font-heading font-bold tracking-tight text-black leading-none", config.text)}>
+          <span
+            className={cn(
+              "font-heading font-bold tracking-tight text-black leading-none",
+              config.text,
+            )}
+          >
             HIKARU BOUKEN
           </span>
-          <span className={cn("text-muted-foreground tracking-widest uppercase", config.japanese)}>
+          <span
+            className={cn(
+              "text-muted-foreground tracking-widest uppercase",
+              config.japanese,
+            )}
+          >
             光る冒険
           </span>
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function HikaruLogoMinimal({ className }: { className?: string }) {
@@ -67,5 +93,5 @@ export function HikaruLogoMinimal({ className }: { className?: string }) {
         </span>
       </div>
     </div>
-  )
+  );
 }

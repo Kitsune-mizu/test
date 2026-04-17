@@ -1,27 +1,29 @@
-import { notFound, redirect } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { createClient } from "@/lib/supabase/server"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { formatDate, formatPrice } from "@/lib/format"
-import { CheckCircle2, Download, ArrowLeft } from "lucide-react"
+import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { formatDate, formatPrice } from "@/lib/format";
+import { CheckCircle2, Download, ArrowLeft } from "lucide-react";
 
 interface OrderSuccessPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function OrderSuccessPage({
   params,
 }: OrderSuccessPageProps) {
-  const { id } = await params
-  const supabase = await createClient()
+  const { id } = await params;
+  const supabase = await createClient();
 
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
   if (!authUser) {
-    redirect("/auth/login")
+    redirect("/auth/login");
   }
 
   const { data: order } = await supabase
@@ -35,22 +37,25 @@ export default async function OrderSuccessPage({
         price,
         products (id, name, slug, image_url)
       )
-    `
+    `,
     )
     .eq("id", id)
     .eq("user_id", authUser.id)
-    .single()
+    .single();
 
   if (!order) {
-    notFound()
+    notFound();
   }
 
   // Only show this page if order is in a completed or successful state
-  if (!["processing", "confirmed", "shipped", "delivered"].includes(order.status)) {
-    redirect(`/account/orders/${id}`)
+  if (
+    !["processing", "confirmed", "shipped", "delivered"].includes(order.status)
+  ) {
+    redirect(`/account/orders/${id}`);
   }
 
-  const orderNumber = order.order_number || `ORD-${order.id.slice(0, 8).toUpperCase()}`
+  const orderNumber =
+    order.order_number || `ORD-${order.id.slice(0, 8).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-background pt-8">
@@ -65,7 +70,8 @@ export default async function OrderSuccessPage({
           </div>
           <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
           <p className="text-muted-foreground text-lg">
-            Your order has been successfully placed. Thank you for your purchase!
+            Your order has been successfully placed. Thank you for your
+            purchase!
           </p>
         </div>
 
@@ -95,49 +101,58 @@ export default async function OrderSuccessPage({
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.order_items.map((item: {
-              id: string
-              quantity: number
-              price: number
-              products: { id: string; name: string; slug: string; image_url: string | null } | null
-            }) => {
-              const product = item.products
-              if (!product) return null
+            {order.order_items.map(
+              (item: {
+                id: string;
+                quantity: number;
+                price: number;
+                products: {
+                  id: string;
+                  name: string;
+                  slug: string;
+                  image_url: string | null;
+                } | null;
+              }) => {
+                const product = item.products;
+                if (!product) return null;
 
-              return (
-                <div key={item.id} className="flex gap-4">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
-                    {product.image_url ? (
-                      <Image
-                        src={product.image_url}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                        sizes="80px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-muted-foreground text-xs">
-                        No image
-                      </div>
-                    )}
+                return (
+                  <div key={item.id} className="flex gap-4">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
+                      {product.image_url ? (
+                        <Image
+                          src={product.image_url}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                          sizes="80px"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-muted-foreground text-xs">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="font-medium hover:text-primary transition-colors line-clamp-1"
+                      >
+                        {product.name}
+                      </Link>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">
+                        {formatPrice(item.price * item.quantity)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="font-medium hover:text-primary transition-colors line-clamp-1"
-                    >
-                      {product.name}
-                    </Link>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Qty: {item.quantity}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
-                  </div>
-                </div>
-              )
-            })}
+                );
+              },
+            )}
 
             <Separator />
 
@@ -194,7 +209,9 @@ export default async function OrderSuccessPage({
             <ul className="space-y-2 text-sm">
               <li className="flex gap-2">
                 <span className="text-primary font-bold">1.</span>
-                <span>We&apos;ll send you a confirmation email with your invoice</span>
+                <span>
+                  We&apos;ll send you a confirmation email with your invoice
+                </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-bold">2.</span>
@@ -226,5 +243,5 @@ export default async function OrderSuccessPage({
         </div>
       </div>
     </div>
-  )
+  );
 }

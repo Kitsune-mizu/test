@@ -1,18 +1,26 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { User, Package, Heart, Bell, Settings, LogOut, Shield } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  User,
+  Package,
+  Heart,
+  Bell,
+  Settings,
+  LogOut,
+  Shield,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 interface AccountSidebarProps {
   user: {
-    id: string
-    name: string | null
-    role: string
-  } | null
+    id: string;
+    name: string | null;
+    role: string;
+  } | null;
 }
 
 const menuItems = [
@@ -21,10 +29,10 @@ const menuItems = [
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
   { href: "/account/notifications", label: "Notifications", icon: Bell },
   { href: "/account/settings", label: "Settings", icon: Settings },
-]
+];
 
 export function AccountSidebar({ user }: AccountSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="bg-card rounded-xl border p-4">
@@ -37,7 +45,9 @@ export function AccountSidebar({ user }: AccountSidebarProps) {
         </Avatar>
         <div className="min-w-0">
           <p className="font-medium truncate">{user?.name || "User"}</p>
-          <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
+          <p className="text-sm text-muted-foreground capitalize">
+            {user?.role}
+          </p>
         </div>
       </div>
 
@@ -46,7 +56,7 @@ export function AccountSidebar({ user }: AccountSidebarProps) {
       {/* Navigation */}
       <nav className="space-y-1">
         {menuItems.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
@@ -55,13 +65,13 @@ export function AccountSidebar({ user }: AccountSidebarProps) {
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <item.icon className="h-4 w-4" />
               {item.label}
             </Link>
-          )
+          );
         })}
 
         {/* Admin Link */}
@@ -90,5 +100,5 @@ export function AccountSidebar({ user }: AccountSidebarProps) {
         </Link>
       </nav>
     </div>
-  )
+  );
 }

@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "sonner"
-import { Loader2, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Loader2, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const categories = [
   "Backpacks",
@@ -28,7 +28,7 @@ const categories = [
   "Accessories",
   "Climbing",
   "Navigation",
-]
+];
 
 const brands = [
   "Patagonia",
@@ -41,16 +41,16 @@ const brands = [
   "Garmin",
   "Nalgene",
   "Coleman",
-]
+];
 
 interface ProductFormProps {
-  mode: "create" | "edit"
-  productId?: string
+  mode: "create" | "edit";
+  productId?: string;
 }
 
 export function ProductForm({ mode, productId }: ProductFormProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -63,38 +63,40 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
     tags: "",
     tax_rate: "0",
     payment_methods: ["card", "cod"],
-  })
+  });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === "name" && { slug: value.toLowerCase().replace(/\s+/g, "-") }),
-    }))
-  }
+      ...(name === "name" && {
+        slug: value.toLowerCase().replace(/\s+/g, "-"),
+      }),
+    }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handlePaymentMethodToggle = (method: string) => {
     setFormData((prev) => {
       const methods = prev.payment_methods.includes(method)
         ? prev.payment_methods.filter((m) => m !== method)
-        : [...prev.payment_methods, method]
-      return { ...prev, payment_methods: methods }
-    })
-  }
+        : [...prev.payment_methods, method];
+      return { ...prev, payment_methods: methods };
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       const payload = {
@@ -106,38 +108,41 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
         image_url: formData.image_url,
-        tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
         tax_rate: parseFloat(formData.tax_rate),
         payment_methods: formData.payment_methods,
-      }
+      };
 
       const response = await fetch(
-        mode === "create"
-          ? "/api/products"
-          : `/api/products/${productId}`,
+        mode === "create" ? "/api/products" : `/api/products/${productId}`,
         {
           method: mode === "create" ? "POST" : "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        }
-      )
+        },
+      );
 
-      if (!response.ok) throw new Error("Failed to save product")
+      if (!response.ok) throw new Error("Failed to save product");
 
       toast.success(
         mode === "create"
           ? "Product created successfully"
-          : "Product updated successfully"
-      )
+          : "Product updated successfully",
+      );
 
-      router.push("/admin/products")
-      router.refresh()
+      router.push("/admin/products");
+      router.refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong")
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -343,7 +348,10 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
                       checked={formData.payment_methods.includes("card")}
                       onCheckedChange={() => handlePaymentMethodToggle("card")}
                     />
-                    <Label htmlFor="payment_card" className="font-normal cursor-pointer">
+                    <Label
+                      htmlFor="payment_card"
+                      className="font-normal cursor-pointer"
+                    >
                       Credit/Debit Card (Visa, Mastercard, Citrus, etc.)
                     </Label>
                   </div>
@@ -353,7 +361,10 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
                       checked={formData.payment_methods.includes("cod")}
                       onCheckedChange={() => handlePaymentMethodToggle("cod")}
                     />
-                    <Label htmlFor="payment_cod" className="font-normal cursor-pointer">
+                    <Label
+                      htmlFor="payment_cod"
+                      className="font-normal cursor-pointer"
+                    >
                       Cash on Delivery (COD)
                     </Label>
                   </div>
@@ -363,11 +374,7 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
 
             {/* Actions */}
             <div className="flex gap-4 pt-4 border-t">
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="gap-2"
-              >
+              <Button type="submit" disabled={isLoading} className="gap-2">
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -389,5 +396,5 @@ export function ProductForm({ mode, productId }: ProductFormProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

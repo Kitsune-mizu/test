@@ -1,49 +1,55 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CheckCircle2, AlertCircle, Loader2, Copy } from 'lucide-react'
-import { HikaruLogo } from '@/components/ui/hikaru-logo'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle2, AlertCircle, Loader2, Copy } from "lucide-react";
+import { HikaruLogo } from "@/components/ui/hikaru-logo";
 
 export default function SetupPage() {
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
   const [credentials, setCredentials] = useState<{
-    customerEmail: string
-    customerPassword: string
-    adminEmail: string
-    adminPassword: string
-  } | null>(null)
+    customerEmail: string;
+    customerPassword: string;
+    adminEmail: string;
+    adminPassword: string;
+  } | null>(null);
 
   const runSetup = async () => {
-    setLoading(true)
-    setStatus('idle')
+    setLoading(true);
+    setStatus("idle");
     try {
-      const response = await fetch('/api/setup')
-      const data = await response.json()
+      const response = await fetch("/api/setup");
+      const data = await response.json();
 
       if (!response.ok) {
-        setStatus('error')
-        setMessage(data.message || 'Setup failed')
+        setStatus("error");
+        setMessage(data.message || "Setup failed");
       } else {
-        setStatus('success')
-        setMessage(data.message)
-        setCredentials(data.credentials)
+        setStatus("success");
+        setMessage(data.message);
+        setCredentials(data.credentials);
       }
     } catch (error) {
-      setStatus('error')
-      setMessage(error instanceof Error ? error.message : 'Setup failed')
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "Setup failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
+    navigator.clipboard.writeText(text);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -83,11 +89,11 @@ export default function SetupPage() {
                   className="w-full"
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {loading ? 'Running Setup...' : 'Run Setup'}
+                  {loading ? "Running Setup..." : "Run Setup"}
                 </Button>
 
                 {/* Status Messages */}
-                {status === 'success' && (
+                {status === "success" && (
                   <Alert className="border-green-200 bg-green-50">
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                     <AlertDescription className="text-green-800">
@@ -96,7 +102,7 @@ export default function SetupPage() {
                   </Alert>
                 )}
 
-                {status === 'error' && (
+                {status === "error" && (
                   <Alert className="border-red-200 bg-red-50">
                     <AlertCircle className="h-4 w-4 text-red-600" />
                     <AlertDescription className="text-red-800">
@@ -119,7 +125,9 @@ export default function SetupPage() {
                         <div className="flex items-center justify-between">
                           <span>Email: {credentials.customerEmail}</span>
                           <button
-                            onClick={() => copyToClipboard(credentials.customerEmail)}
+                            onClick={() =>
+                              copyToClipboard(credentials.customerEmail)
+                            }
                             className="text-primary hover:text-primary/80"
                           >
                             <Copy className="h-4 w-4" />
@@ -128,7 +136,9 @@ export default function SetupPage() {
                         <div className="flex items-center justify-between">
                           <span>Password: {credentials.customerPassword}</span>
                           <button
-                            onClick={() => copyToClipboard(credentials.customerPassword)}
+                            onClick={() =>
+                              copyToClipboard(credentials.customerPassword)
+                            }
                             className="text-primary hover:text-primary/80"
                           >
                             <Copy className="h-4 w-4" />
@@ -146,7 +156,9 @@ export default function SetupPage() {
                         <div className="flex items-center justify-between">
                           <span>Email: {credentials.adminEmail}</span>
                           <button
-                            onClick={() => copyToClipboard(credentials.adminEmail)}
+                            onClick={() =>
+                              copyToClipboard(credentials.adminEmail)
+                            }
                             className="text-primary hover:text-primary/80"
                           >
                             <Copy className="h-4 w-4" />
@@ -155,7 +167,9 @@ export default function SetupPage() {
                         <div className="flex items-center justify-between">
                           <span>Password: {credentials.adminPassword}</span>
                           <button
-                            onClick={() => copyToClipboard(credentials.adminPassword)}
+                            onClick={() =>
+                              copyToClipboard(credentials.adminPassword)
+                            }
                             className="text-primary hover:text-primary/80"
                           >
                             <Copy className="h-4 w-4" />
@@ -165,14 +179,17 @@ export default function SetupPage() {
                     </div>
 
                     <div className="text-xs text-neutral-500 bg-yellow-50 p-2 rounded">
-                      💡 Tip: Admin account sudah memiliki role="admin" di database
+                      💡 Tip: Admin account sudah memiliki role="admin" di
+                      database
                     </div>
                   </div>
                 )}
 
                 {/* Info Box */}
                 <div className="bg-blue-50 p-4 rounded-lg text-sm text-neutral-600">
-                  <p className="font-medium text-blue-900 mb-2">ℹ️ Informasi Database:</p>
+                  <p className="font-medium text-blue-900 mb-2">
+                    ℹ️ Informasi Database:
+                  </p>
                   <ul className="list-disc list-inside space-y-1 text-xs">
                     <li>SQL migrations berjalan otomatis via setup endpoint</li>
                     <li>10+ produk demo akan di-seed</li>
@@ -213,5 +230,5 @@ export default function SetupPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { Loader2, Trash2, Check } from "lucide-react"
-import type { SavedPaymentMethod } from "@/lib/types"
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { Loader2, Trash2, Check } from "lucide-react";
+import type { SavedPaymentMethod } from "@/lib/types";
 
 interface PaymentMethodsListProps {
-  methods: SavedPaymentMethod[]
-  onMethodAdded?: () => void
+  methods: SavedPaymentMethod[];
+  onMethodAdded?: () => void;
 }
 
 const CARD_BRANDS = [
@@ -28,20 +28,23 @@ const CARD_BRANDS = [
   { value: "citrus", label: "Citrus" },
   { value: "amex", label: "American Express" },
   { value: "discover", label: "Discover" },
-]
+];
 
-export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMethodsListProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showForm, setShowForm] = useState(false)
+export function PaymentMethodsList({
+  methods = [],
+  onMethodAdded,
+}: PaymentMethodsListProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     card_number: "",
     card_holder: "",
     card_brand: "visa",
     expiry_date: "",
-  })
+  });
 
   const handleAddPaymentMethod = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Validate input
     if (
@@ -49,11 +52,11 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
       !formData.card_holder ||
       !formData.expiry_date
     ) {
-      toast.error("Please fill in all required fields")
-      return
+      toast.error("Please fill in all required fields");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/payment-methods", {
@@ -67,45 +70,48 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
           expiry_date: formData.expiry_date,
           is_default: methods.length === 0,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Failed to add payment method")
+        const error = await response.json();
+        throw new Error(error.error || "Failed to add payment method");
       }
 
-      toast.success("Payment method added successfully")
+      toast.success("Payment method added successfully");
       setFormData({
         card_number: "",
         card_holder: "",
         card_brand: "visa",
         expiry_date: "",
-      })
-      setShowForm(false)
-      onMethodAdded?.()
+      });
+      setShowForm(false);
+      onMethodAdded?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to add payment method")
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add payment method",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeleteMethod = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this payment method?")) return
+    if (!confirm("Are you sure you want to delete this payment method?"))
+      return;
 
     try {
       const response = await fetch(`/api/payment-methods/${id}`, {
         method: "DELETE",
-      })
+      });
 
-      if (!response.ok) throw new Error("Failed to delete")
+      if (!response.ok) throw new Error("Failed to delete");
 
-      toast.success("Payment method deleted")
-      onMethodAdded?.()
+      toast.success("Payment method deleted");
+      onMethodAdded?.();
     } catch (error) {
-      toast.error("Failed to delete payment method")
+      toast.error("Failed to delete payment method");
     }
-  }
+  };
 
   const handleSetDefault = async (id: string) => {
     try {
@@ -113,16 +119,16 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_default: true }),
-      })
+      });
 
-      if (!response.ok) throw new Error("Failed to update")
+      if (!response.ok) throw new Error("Failed to update");
 
-      toast.success("Default payment method updated")
-      onMethodAdded?.()
+      toast.success("Default payment method updated");
+      onMethodAdded?.();
     } catch (error) {
-      toast.error("Failed to update payment method")
+      toast.error("Failed to update payment method");
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -244,18 +250,24 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <p className="font-semibold">{method.card_brand?.toUpperCase()}</p>
+                      <p className="font-semibold">
+                        {method.card_brand?.toUpperCase()}
+                      </p>
                       {method.is_default && (
                         <Badge variant="default" className="text-xs">
                           Default
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{method.card_number}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {method.card_number}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       Expires: {method.expiry_date}
                     </p>
-                    <p className="text-sm font-medium mt-1">{method.card_holder}</p>
+                    <p className="text-sm font-medium mt-1">
+                      {method.card_holder}
+                    </p>
                   </div>
 
                   <div className="flex gap-2">
@@ -286,7 +298,9 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
       ) : (
         !showForm && (
           <div className="text-center py-8 border border-dashed rounded-lg">
-            <p className="text-muted-foreground mb-4">No payment methods added yet</p>
+            <p className="text-muted-foreground mb-4">
+              No payment methods added yet
+            </p>
           </div>
         )
       )}
@@ -302,5 +316,5 @@ export function PaymentMethodsList({ methods = [], onMethodAdded }: PaymentMetho
         </Button>
       )}
     </div>
-  )
+  );
 }

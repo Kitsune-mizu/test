@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 /**
  * Email notification system
@@ -7,21 +7,21 @@
  */
 
 export interface EmailTemplate {
-  subject: string
-  html: string
-  text: string
+  subject: string;
+  html: string;
+  text: string;
 }
 
 /**
  * Generate order confirmation email
  */
-export function generateOrderConfirmationEmail(orderData: {
-  orderNumber: string
-  customerName: string
-  totalPrice: number
-  items: Array<{ name: string; quantity: number; price: number }>
-  trackingUrl: string
-}): EmailTemplate {
+export async function generateOrderConfirmationEmail(orderData: {
+  orderNumber: string;
+  customerName: string;
+  totalPrice: number;
+  items: Array<{ name: string; quantity: number; price: number }>;
+  trackingUrl: string;
+}): Promise<EmailTemplate> {
   const itemsHtml = orderData.items
     .map(
       (item) =>
@@ -29,9 +29,9 @@ export function generateOrderConfirmationEmail(orderData: {
           <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${item.price.toFixed(2)}</td>
-        </tr>`
+        </tr>`,
     )
-    .join('')
+    .join("");
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -68,7 +68,7 @@ export function generateOrderConfirmationEmail(orderData: {
         If you have any questions, please contact our support team.
       </p>
     </div>
-  `
+  `;
 
   const text = `
 Thank you for your order!
@@ -77,52 +77,54 @@ Order Number: #${orderData.orderNumber}
 Total Amount: $${orderData.totalPrice.toFixed(2)}
 
 Items:
-${orderData.items.map((item) => `- ${item.name} (Qty: ${item.quantity}) - $${item.price.toFixed(2)}`).join('\n')}
+${orderData.items.map((item) => `- ${item.name} (Qty: ${item.quantity}) - $${item.price.toFixed(2)}`).join("\n")}
 
 Track your order: ${orderData.trackingUrl}
-  `
+  `;
 
   return {
     subject: `Order Confirmation - #${orderData.orderNumber}`,
     html,
     text,
-  }
+  };
 }
 
 /**
  * Generate order status update email
  */
-export function generateOrderStatusEmail(orderData: {
-  orderNumber: string
-  customerName: string
-  status: string
-  statusJapanese: string
-  trackingNumber?: string
-  trackingUrl?: string
-}): EmailTemplate {
+export async function generateOrderStatusEmail(orderData: {
+  orderNumber: string;
+  customerName: string;
+  status: string;
+  statusJapanese: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+}): Promise<EmailTemplate> {
   const statusMessages: Record<string, { title: string; message: string }> = {
     confirmed: {
-      title: '✅ Order Confirmed',
-      message: 'Your order has been confirmed and will be processed soon.',
+      title: "✅ Order Confirmed",
+      message: "Your order has been confirmed and will be processed soon.",
     },
     preparing: {
-      title: '⚙️ Preparing Your Order',
-      message: 'We are currently picking and packing your items.',
+      title: "⚙️ Preparing Your Order",
+      message: "We are currently picking and packing your items.",
     },
     shipped: {
-      title: '📦 Your Order Has Shipped!',
-      message: 'Your order is on the way. Track your package using the link below.',
+      title: "📦 Your Order Has Shipped!",
+      message:
+        "Your order is on the way. Track your package using the link below.",
     },
     delivered: {
-      title: '🎉 Order Delivered!',
-      message: 'Thank you for shopping with us. We hope you enjoy your purchase!',
+      title: "🎉 Order Delivered!",
+      message:
+        "Thank you for shopping with us. We hope you enjoy your purchase!",
     },
-  }
+  };
 
   const statusInfo = statusMessages[orderData.status] || {
-    title: 'Order Update',
-    message: 'Your order status has been updated.',
-  }
+    title: "Order Update",
+    message: "Your order status has been updated.",
+  };
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -134,22 +136,26 @@ export function generateOrderStatusEmail(orderData: {
       <div style="background-color: #f5f5f5; padding: 16px; margin: 20px 0; border-radius: 8px;">
         <p><strong>Order Number:</strong> #${orderData.orderNumber}</p>
         <p><strong>Status:</strong> ${orderData.status} (${orderData.statusJapanese})</p>
-        ${orderData.trackingNumber ? `<p><strong>Tracking Number:</strong> ${orderData.trackingNumber}</p>` : ''}
+        ${orderData.trackingNumber ? `<p><strong>Tracking Number:</strong> ${orderData.trackingNumber}</p>` : ""}
       </div>
 
-      ${orderData.trackingUrl ? `
+      ${
+        orderData.trackingUrl
+          ? `
         <div style="margin: 20px 0;">
           <a href="${orderData.trackingUrl}" style="background-color: #E10600; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
             Track Your Package
           </a>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
 
       <p style="color: #666; font-size: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
         Thank you for your business! ご注文ありがとうございます
       </p>
     </div>
-  `
+  `;
 
   const text = `
 ${statusInfo.title}
@@ -160,15 +166,15 @@ ${statusInfo.message}
 
 Order Number: #${orderData.orderNumber}
 Status: ${orderData.status} (${orderData.statusJapanese})
-${orderData.trackingNumber ? `Tracking Number: ${orderData.trackingNumber}` : ''}
-${orderData.trackingUrl ? `\nTrack your package: ${orderData.trackingUrl}` : ''}
-  `
+${orderData.trackingNumber ? `Tracking Number: ${orderData.trackingNumber}` : ""}
+${orderData.trackingUrl ? `\nTrack your package: ${orderData.trackingUrl}` : ""}
+  `;
 
   return {
     subject: `Order ${orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1)} - #${orderData.orderNumber}`,
     html,
     text,
-  }
+  };
 }
 
 /**
@@ -177,13 +183,13 @@ ${orderData.trackingUrl ? `\nTrack your package: ${orderData.trackingUrl}` : ''}
  */
 export async function sendEmail(
   to: string,
-  template: EmailTemplate
+  template: EmailTemplate,
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     // Log untuk demo (dalam production, integrasikan dengan email provider)
-    console.log('[Email] Sending to:', to)
-    console.log('[Email] Subject:', template.subject)
-    console.log('[Email] Message:', template.text)
+    console.log("[Email] Sending to:", to);
+    console.log("[Email] Subject:", template.subject);
+    console.log("[Email] Message:", template.text);
 
     // TODO: Integrate dengan Resend, SendGrid, atau provider lain
     // const response = await resend.emails.send({
@@ -196,13 +202,13 @@ export async function sendEmail(
     return {
       success: true,
       messageId: `${Date.now()}-${Math.random().toString(36).substring(7)}`,
-    }
+    };
   } catch (error) {
-    console.error('[v0] Email send error:', error)
+    console.error("[v0] Email send error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to send email',
-    }
+      error: error instanceof Error ? error.message : "Failed to send email",
+    };
   }
 }
 
@@ -212,23 +218,23 @@ export async function sendEmail(
 export async function sendOrderConfirmationEmail(
   customerEmail: string,
   orderData: {
-    orderNumber: string
-    customerName: string
-    totalPrice: number
-    items: Array<{ name: string; quantity: number; price: number }>
-    orderId: string
-  }
+    orderNumber: string;
+    customerName: string;
+    totalPrice: number;
+    items: Array<{ name: string; quantity: number; price: number }>;
+    orderId: string;
+  },
 ): Promise<void> {
   try {
-    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`
+    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`;
     const template = generateOrderConfirmationEmail({
       ...orderData,
       trackingUrl,
-    })
+    });
 
-    await sendEmail(customerEmail, template)
+    await sendEmail(customerEmail, template);
   } catch (error) {
-    console.error('[v0] Failed to send order confirmation email:', error)
+    console.error("[v0] Failed to send order confirmation email:", error);
   }
 }
 
@@ -238,23 +244,23 @@ export async function sendOrderConfirmationEmail(
 export async function sendOrderStatusEmail(
   customerEmail: string,
   orderData: {
-    orderNumber: string
-    customerName: string
-    status: string
-    statusJapanese: string
-    trackingNumber?: string
-    orderId: string
-  }
+    orderNumber: string;
+    customerName: string;
+    status: string;
+    statusJapanese: string;
+    trackingNumber?: string;
+    orderId: string;
+  },
 ): Promise<void> {
   try {
-    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`
+    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`;
     const template = generateOrderStatusEmail({
       ...orderData,
       trackingUrl,
-    })
+    });
 
-    await sendEmail(customerEmail, template)
+    await sendEmail(customerEmail, template);
   } catch (error) {
-    console.error('[v0] Failed to send order status email:', error)
+    console.error("[v0] Failed to send order status email:", error);
   }
 }

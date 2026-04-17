@@ -1,20 +1,24 @@
-import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ChangePasswordForm } from "@/components/account/change-password-form"
+import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ChangePasswordForm } from "@/components/account/change-password-form";
 
 export default async function AdminSettingsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-heading font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage admin settings and security</p>
+        <p className="text-muted-foreground">
+          Manage admin settings and security
+        </p>
       </div>
 
       {/* Admin Info */}
@@ -29,7 +33,9 @@ export default async function AdminSettingsPage() {
               <p className="text-lg">{user?.email}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Last Sign In</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Last Sign In
+              </p>
               <p className="text-lg">
                 {user?.last_sign_in_at
                   ? new Date(user.last_sign_in_at).toLocaleString()
@@ -49,7 +55,8 @@ export default async function AdminSettingsPage() {
           <Alert className="border-destructive/50 bg-destructive/5">
             <AlertCircle className="h-4 w-4 text-destructive" />
             <AlertDescription>
-              Your account has full administrative access. Keep your password secure.
+              Your account has full administrative access. Keep your password
+              secure.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -80,5 +87,5 @@ export default async function AdminSettingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

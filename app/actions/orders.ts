@@ -1,50 +1,52 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
-import { isDemoAccount } from "@/lib/demo"
-import { generateOrderId } from "@/lib/order-id"
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { isDemoAccount } from "@/lib/demo";
+import { generateOrderId } from "@/lib/order-id";
 import {
   notifyAdminsNewOrder,
   createOrderConfirmedNotification,
-} from "@/lib/helpers/notification-helpers"
-import { deductStock } from "@/lib/helpers/stock-helpers"
-import { sendOrderConfirmationEmail } from "@/lib/helpers/email-helpers"
+} from "@/lib/helpers/notification-helpers";
+import { deductStock } from "@/lib/helpers/stock-helpers";
+import { sendOrderConfirmationEmail } from "@/lib/helpers/email-helpers";
 
 interface OrderItem {
-  product_id: string
-  quantity: number
-  price: number
+  product_id: string;
+  quantity: number;
+  price: number;
 }
 
 interface CreateOrderParams {
-  totalPrice: number
-  paymentMethod: string
-  shippingMethod: string
-  shippingAddress: string
-  items: OrderItem[]
+  totalPrice: number;
+  paymentMethod: string;
+  shippingMethod: string;
+  shippingAddress: string;
+  items: OrderItem[];
 }
 
 export async function createOrderAction(params: CreateOrderParams) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   // Check if this is a demo account
-  const isDemo = isDemoAccount(user.email)
-  
+  const isDemo = isDemoAccount(user.email);
+
   // For demo accounts, set status to 'processing' then auto-update to 'confirmed'
   // For real accounts, orders start as pending and need payment confirmation
-  const orderStatus = isDemo ? "processing" : "pending"
-  
+  const orderStatus = isDemo ? "processing" : "pending";
+
   // Generate alphanumeric order ID
-  const orderId = generateOrderId()
-  
+  const orderId = generateOrderId();
+
   // Generate order number for invoice
-  const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
+  const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
 
   // Create order
   const { data: order, error: orderError } = await supabase
@@ -60,10 +62,10 @@ export async function createOrderAction(params: CreateOrderParams) {
       order_number: orderNumber,
     })
     .select("id")
-    .single()
+    .single();
 
   if (orderError || !order) {
-    return { error: orderError?.message || "Failed to create order" }
+    return { error: orderError?.message || "Failed to create order" };
   }
 
   // Create order items
@@ -72,37 +74,39 @@ export async function createOrderAction(params: CreateOrderParams) {
     product_id: item.product_id,
     quantity: item.quantity,
     price: item.price,
-  }))
+  }));
 
   const { error: itemsError } = await supabase
     .from("order_items")
-    .insert(orderItems)
+    .insert(orderItems);
 
   if (itemsError) {
     // Rollback order if items fail
-    await supabase.from("orders").delete().eq("id", order.id)
-    return { error: itemsError.message }
+    await supabase.from("orders").delete().eq("id", order.id);
+    return { error: itemsError.message };
   }
 
   // Update product stock
   for (const item of params.items) {
-    await supabase.rpc("decrement_stock", {
-      product_id: item.product_id,
-      quantity: item.quantity,
-    }).catch(() => {
-      // Silently fail stock update - admin can handle manually
-    })
+    await supabase
+      .rpc("decrement_stock", {
+        product_id: item.product_id,
+        quantity: item.quantity,
+      })
+      .catch(() => {
+        // Silently fail stock update - admin can handle manually
+      });
   }
 
   // Clear cart
-  await supabase.from("cart").delete().eq("user_id", user.id)
+  await supabase.from("cart").delete().eq("user_id", user.id);
 
   // For demo accounts, immediately update status to 'confirmed' to simulate successful payment
   if (isDemo) {
     await supabase
       .from("orders")
       .update({ status: "confirmed" })
-      .eq("id", order.id)
+      .eq("id", order.id);
   }
 
   // Notify admins about new order
@@ -111,15 +115,15 @@ export async function createOrderAction(params: CreateOrderParams) {
       .from("users")
       .select("name")
       .eq("id", user.id)
-      .single()
+      .single();
 
     await notifyAdminsNewOrder(
       orderId,
       customerProfile?.name || "Customer",
-      params.totalPrice
-    )
+      params.totalPrice,
+    );
   } catch (error) {
-    console.error("[v0] Failed to notify admins:", error)
+    console.error("[v0] Failed to notify admins:", error);
   }
 
   // Notify customer - send order confirmation email
@@ -128,7 +132,7 @@ export async function createOrderAction(params: CreateOrderParams) {
       .from("users")
       .select("name, email")
       .eq("id", user.id)
-      .single()
+      .single();
 
     if (userProfile?.email) {
       await sendOrderConfirmationEmail(userProfile.email, {
@@ -137,10 +141,10 @@ export async function createOrderAction(params: CreateOrderParams) {
         totalPrice: params.totalPrice,
         items: params.items,
         orderId: order.id,
-      })
+      });
     }
   } catch (error) {
-    console.error("[v0] Failed to send order confirmation email:", error)
+    console.error("[v0] Failed to send order confirmation email:", error);
   }
 
   // Create notification
@@ -149,18 +153,20 @@ export async function createOrderAction(params: CreateOrderParams) {
     message: `Your order #${orderNumber} has been ${isDemo ? "created in test mode" : "placed successfully"}!`,
     link: `/account/orders/${orderId}`,
     type: "order",
-  })
+  });
 
-  revalidatePath("/", "layout")
-  return { success: true, orderId: orderId }
+  revalidatePath("/", "layout");
+  return { success: true, orderId: orderId };
 }
 
 export async function cancelOrderAction(orderId: string) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Not authenticated" }
+    return { error: "Not authenticated" };
   }
 
   // Verify order belongs to user and can be cancelled
@@ -169,22 +175,22 @@ export async function cancelOrderAction(orderId: string) {
     .select("id, status")
     .eq("id", orderId)
     .eq("user_id", user.id)
-    .single()
+    .single();
 
   if (!order) {
-    return { error: "Order not found" }
+    return { error: "Order not found" };
   }
 
   if (!["pending", "confirmed"].includes(order.status)) {
-    return { error: "Order cannot be cancelled at this stage" }
+    return { error: "Order cannot be cancelled at this stage" };
   }
 
   const { error } = await supabase
     .from("orders")
     .update({ status: "cancelled" })
-    .eq("id", orderId)
+    .eq("id", orderId);
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message };
 
   // Create notification
   await supabase.from("notifications").insert({
@@ -192,8 +198,8 @@ export async function cancelOrderAction(orderId: string) {
     message: `Your order #${orderId.slice(0, 8)} has been cancelled.`,
     link: `/account/orders/${orderId}`,
     type: "order",
-  })
+  });
 
-  revalidatePath("/", "layout")
-  return { success: true }
+  revalidatePath("/", "layout");
+  return { success: true };
 }

@@ -1,23 +1,25 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
-import { CheckoutForm } from "@/components/checkout/checkout-form"
-import { OrderSummary } from "@/components/checkout/order-summary"
-import { isDemoAccount } from "@/lib/demo"
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { OrderSummary } from "@/components/checkout/order-summary";
+import { isDemoAccount } from "@/lib/demo";
 
 export const metadata = {
   title: "Checkout | Hikaru Bouken",
   description: "Complete your order",
-}
+};
 
 export default async function CheckoutPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
   if (!authUser) {
-    redirect("/auth/login?redirect=/checkout")
+    redirect("/auth/login?redirect=/checkout");
   }
 
   // Get user profile
@@ -25,12 +27,13 @@ export default async function CheckoutPage() {
     .from("users")
     .select("*")
     .eq("id", authUser.id)
-    .single()
+    .single();
 
   // Get cart items
   const { data: cartItems } = await supabase
     .from("cart")
-    .select(`
+    .select(
+      `
       id,
       quantity,
       product_id,
@@ -42,26 +45,27 @@ export default async function CheckoutPage() {
         stock,
         image_url
       )
-    `)
-    .eq("user_id", authUser.id)
+    `,
+    )
+    .eq("user_id", authUser.id);
 
   if (!cartItems || cartItems.length === 0) {
-    redirect("/cart")
+    redirect("/cart");
   }
 
-  const cartCount = cartItems.length
+  const cartCount = cartItems.length;
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => {
-    const product = item.products as { price: number } | null
-    return sum + (product?.price || 0) * item.quantity
-  }, 0)
+    const product = item.products as { price: number } | null;
+    return sum + (product?.price || 0) * item.quantity;
+  }, 0);
 
-  const shipping = subtotal >= 100 ? 0 : 9.99
-  const total = subtotal + shipping
-  
+  const shipping = subtotal >= 100 ? 0 : 9.99;
+  const total = subtotal + shipping;
+
   // Check if this is a demo account
-  const isDemoMode = isDemoAccount(authUser?.email)
+  const isDemoMode = isDemoAccount(authUser?.email);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -73,11 +77,7 @@ export default async function CheckoutPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <CheckoutForm
-                user={user}
-                cartItems={cartItems}
-                total={total}
-              />
+              <CheckoutForm user={user} cartItems={cartItems} total={total} />
             </div>
 
             {/* Order Summary */}
@@ -95,5 +95,5 @@ export default async function CheckoutPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

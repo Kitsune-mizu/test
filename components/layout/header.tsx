@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import dynamic from "next/dynamic"
-import { useState, useEffect, useRef } from "react"
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useState, useEffect, useRef } from "react";
 import {
   Menu,
   ShoppingCart,
@@ -15,150 +15,173 @@ import {
   Package,
   Home,
   Grid,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { HikaruLogoMinimal } from "@/components/ui/hikaru-logo"
-import { createClient } from "@/lib/supabase/client"
-import { NotificationCenter } from "@/components/notifications/notification-center"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { HikaruLogoMinimal } from "@/components/ui/hikaru-logo";
+import { createClient } from "@/lib/supabase/client";
+import { NotificationCenter } from "@/components/notifications/notification-center";
 // SheetTitle & SheetDescription must be static (Radix a11y requirement)
-import { SheetTitle, SheetDescription } from "@/components/ui/sheet"
+import { SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 // ─── Dynamic imports (SSR off — avoids hydration mismatch) ───────────────────
 
 const DropdownMenu = dynamic(
   () => import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenu),
-  { ssr: false }
-)
+  { ssr: false },
+);
 const DropdownMenuContent = dynamic(
-  () => import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuContent),
-  { ssr: false }
-)
+  () =>
+    import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuContent),
+  { ssr: false },
+);
 const DropdownMenuItem = dynamic(
   () => import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuItem),
-  { ssr: false }
-)
+  { ssr: false },
+);
 const DropdownMenuSeparator = dynamic(
-  () => import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuSeparator),
-  { ssr: false }
-)
+  () =>
+    import("@/components/ui/dropdown-menu").then(
+      (m) => m.DropdownMenuSeparator,
+    ),
+  { ssr: false },
+);
 const DropdownMenuTrigger = dynamic(
-  () => import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuTrigger),
-  { ssr: false }
-)
+  () =>
+    import("@/components/ui/dropdown-menu").then((m) => m.DropdownMenuTrigger),
+  { ssr: false },
+);
 const Sheet = dynamic(
   () => import("@/components/ui/sheet").then((m) => m.Sheet),
-  { ssr: false }
-)
+  { ssr: false },
+);
 const SheetContent = dynamic(
   () => import("@/components/ui/sheet").then((m) => m.SheetContent),
-  { ssr: false }
-)
+  { ssr: false },
+);
 const SheetTrigger = dynamic(
   () => import("@/components/ui/sheet").then((m) => m.SheetTrigger),
-  { ssr: false }
-)
+  { ssr: false },
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UserData {
-  id: string
-  name: string | null
-  role: string
+  id: string;
+  name: string | null;
+  role: string;
 }
 
 interface HeaderProps {
   // Passed from server component — same pattern as AccountSidebar
-  user?: UserData | null
-  cartCount?: number
+  user?: UserData | null;
+  cartCount?: number;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const categories = [
-  { name: "Sandals",           href: "/products?category=Sandals",      japanese: "サンダル"     },
-  { name: "Hiking Shoes",      href: "/products?category=Hiking+Shoes", japanese: "登山靴"       },
-  { name: "Backpacks",         href: "/products?category=Backpacks",    japanese: "バックパック" },
-  { name: "Jackets",           href: "/products?category=Jackets",      japanese: "ジャケット"   },
-  { name: "Outdoor Equipment", href: "/products?category=Equipment",    japanese: "装備"         },
-]
+  { name: "Sandals", href: "/products?category=Sandals", japanese: "サンダル" },
+  {
+    name: "Hiking Shoes",
+    href: "/products?category=Hiking+Shoes",
+    japanese: "登山靴",
+  },
+  {
+    name: "Backpacks",
+    href: "/products?category=Backpacks",
+    japanese: "バックパック",
+  },
+  {
+    name: "Jackets",
+    href: "/products?category=Jackets",
+    japanese: "ジャケット",
+  },
+  {
+    name: "Outdoor Equipment",
+    href: "/products?category=Equipment",
+    japanese: "装備",
+  },
+];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function Header({ user, cartCount = 0 }: HeaderProps) {
-  const [mounted, setMounted]                       = useState(false)
+  const [mounted, setMounted] = useState(false);
   // Initialise from server-passed prop — same as sidebar does
-  const [currentUser, setCurrentUser]               = useState<UserData | null>(user ?? null)
-  const [mobileOpen, setMobileOpen]                 = useState(false)
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false)
+  const [currentUser, setCurrentUser] = useState<UserData | null>(user ?? null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
   // Keep prop changes (e.g. after router.refresh()) in sync with local state
   useEffect(() => {
-    setCurrentUser(user ?? null)
-  }, [user])
+    setCurrentUser(user ?? null);
+  }, [user]);
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
 
     // ProfileForm dispatches "profile:updated" with the new name in detail
     // so we can update state immediately — before router.refresh() rerenders
     const handleProfileUpdated = (e: Event) => {
-      const { name, role } = (e as CustomEvent<{ name: string; role: string }>).detail ?? {}
+      const { name, role } =
+        (e as CustomEvent<{ name: string; role: string }>).detail ?? {};
       setCurrentUser((prev) => {
-        if (!prev) return prev
+        if (!prev) return prev;
         return {
           ...prev,
           name: name ?? prev.name,
           role: role ?? prev.role,
-        }
-      })
-    }
+        };
+      });
+    };
 
-    window.addEventListener("profile:updated", handleProfileUpdated)
-    return () => window.removeEventListener("profile:updated", handleProfileUpdated)
-  }, [])
+    window.addEventListener("profile:updated", handleProfileUpdated);
+    return () =>
+      window.removeEventListener("profile:updated", handleProfileUpdated);
+  }, []);
 
   // ─── Supabase auth listener ─────────────────────────────────────────────────
   useEffect(() => {
     // Only run on client
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return;
 
-    const supabase = createClient()
-    
+    const supabase = createClient();
+
     // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // Handle sign in / session refresh
-        if (session?.user) {
-          setCurrentUser({
-            id: session.user.id,
-            name: session.user.user_metadata?.name ?? null,
-            role: session.user.user_metadata?.role ?? "customer",
-          })
-        } 
-        // Handle sign out
-        else if (event === 'SIGNED_OUT') {
-          setCurrentUser(null)
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Handle sign in / session refresh
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          name: session.user.user_metadata?.name ?? null,
+          role: session.user.user_metadata?.role ?? "customer",
+        });
       }
-    )
+      // Handle sign out
+      else if (event === "SIGNED_OUT") {
+        setCurrentUser(null);
+      }
+    });
 
     // Cleanup subscription on unmount
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // ─── Derived display values ─────────────────────────────────────────────────
 
-  const userInitial = (currentUser?.name ?? "U").charAt(0).toUpperCase()
-  const displayName = currentUser?.name ?? "User"
-  const displayRole = currentUser?.role === "admin" ? "Administrator" : "Customer"
+  const userInitial = (currentUser?.name ?? "U").charAt(0).toUpperCase();
+  const displayName = currentUser?.name ?? "User";
+  const displayRole =
+    currentUser?.role === "admin" ? "Administrator" : "Customer";
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-neutral-200">
-
       {/* Announcement bar */}
       <div className="bg-black text-white text-center py-2 text-xs tracking-wide">
         <span className="opacity-80">FREE SHIPPING ON ORDERS OVER $100</span>
@@ -168,7 +191,6 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
 
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-6">
-
           {/* ── Mobile hamburger ───────────────────────────────────────────── */}
           <div className="flex items-center gap-2 lg:hidden">
             {mounted && (
@@ -179,16 +201,25 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                   </Button>
                 </SheetTrigger>
 
-                <SheetContent side="left" className="w-[300px] p-0 flex flex-col">
+                <SheetContent
+                  side="left"
+                  className="w-[300px] p-0 flex flex-col"
+                >
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                  <SheetDescription className="sr-only">Main navigation links</SheetDescription>
+                  <SheetDescription className="sr-only">
+                    Main navigation links
+                  </SheetDescription>
 
                   {/* Brand header */}
                   <div className="flex items-center gap-3 px-5 py-4 border-b border-neutral-100">
                     <HikaruLogoMinimal />
                     <div className="flex flex-col leading-tight">
-                      <span className="text-sm font-semibold tracking-wide text-black">HIKARU</span>
-                      <span className="text-[10px] tracking-widest text-neutral-400 font-medium">冒険 BOUKEN</span>
+                      <span className="text-sm font-semibold tracking-wide text-black">
+                        HIKARU
+                      </span>
+                      <span className="text-[10px] tracking-widest text-neutral-400 font-medium">
+                        冒険 BOUKEN
+                      </span>
                     </div>
                   </div>
 
@@ -199,15 +230,18 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                         {userInitial}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{displayName}</p>
-                        <p className="text-xs text-neutral-500">{displayRole}</p>
+                        <p className="text-sm font-medium truncate">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-neutral-500">
+                          {displayRole}
+                        </p>
                       </div>
                     </div>
                   )}
 
                   {/* Nav links */}
                   <nav className="flex-1 overflow-y-auto py-3">
-
                     <Link
                       href="/"
                       onClick={() => setMobileOpen(false)}
@@ -253,7 +287,9 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                               className="flex items-center justify-between px-8 py-2.5 text-sm text-neutral-600 hover:text-black hover:bg-neutral-100 transition-colors"
                             >
                               <span>{cat.name}</span>
-                              <span className="text-xs text-neutral-400">{cat.japanese}</span>
+                              <span className="text-xs text-neutral-400">
+                                {cat.japanese}
+                              </span>
                             </Link>
                           ))}
                         </div>
@@ -321,8 +357,13 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                         Sign Out
                       </Link>
                     ) : (
-                      <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                        <Button className="w-full bg-black text-white">Sign In</Button>
+                      <Link
+                        href="/auth/login"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        <Button className="w-full bg-black text-white">
+                          Sign In
+                        </Button>
                       </Link>
                     )}
                   </div>
@@ -338,11 +379,17 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
 
           {/* ── Desktop nav ────────────────────────────────────────────────── */}
           <nav className="hidden lg:flex items-center gap-8">
-            <Link href="/" className="text-sm font-medium text-neutral-600 hover:text-black">
+            <Link
+              href="/"
+              className="text-sm font-medium text-neutral-600 hover:text-black"
+            >
               Home
             </Link>
 
-            <Link href="/products" className="text-sm font-medium text-neutral-600 hover:text-black">
+            <Link
+              href="/products"
+              className="text-sm font-medium text-neutral-600 hover:text-black"
+            >
               Shop All
             </Link>
 
@@ -355,12 +402,14 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                 <DropdownMenuContent className="w-64 bg-white">
                   {categories.map((cat) => (
                     <DropdownMenuItem key={cat.name} asChild>
-                      <Link 
+                      <Link
                         href={cat.href}
                         className="flex items-center justify-between w-full"
                       >
                         <span>{cat.name}</span>
-                        <span className="text-xs text-neutral-400 ml-3">{cat.japanese}</span>
+                        <span className="text-xs text-neutral-400 ml-3">
+                          {cat.japanese}
+                        </span>
                       </Link>
                     </DropdownMenuItem>
                   ))}
@@ -371,11 +420,8 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
 
           {/* ── Right-side icons ───────────────────────────────────────────── */}
           <div className="flex items-center gap-1">
-
             {/* Notifications — logged in only */}
-            {currentUser && mounted && (
-              <NotificationCenter />
-            )}
+            {currentUser && mounted && <NotificationCenter />}
 
             {/* Wishlist — logged in only */}
             {currentUser && (
@@ -402,7 +448,11 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
             {currentUser && mounted && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden lg:flex">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden lg:flex"
+                  >
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -429,7 +479,10 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/dashboard" className="text-[#E10600]">
+                        <Link
+                          href="/admin/dashboard"
+                          className="text-[#E10600]"
+                        >
                           Admin Dashboard
                         </Link>
                       </DropdownMenuItem>
@@ -448,15 +501,17 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
             {/* Sign In — desktop, logged out */}
             {!currentUser && (
               <Link href="/auth/login">
-                <Button size="sm" className="bg-black text-white ml-2 hidden lg:flex">
+                <Button
+                  size="sm"
+                  className="bg-black text-white ml-2 hidden lg:flex"
+                >
                   Sign In
                 </Button>
               </Link>
             )}
           </div>
-
         </div>
       </div>
     </header>
-  )
+  );
 }

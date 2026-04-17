@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatDate, formatPrice } from "@/lib/format"
-import { Package, ChevronRight, Zap } from "lucide-react"
-import type { OrderWithItems } from "@/lib/types"
+import Link from "next/link";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDate, formatPrice } from "@/lib/format";
+import { Package, ChevronRight, Zap } from "lucide-react";
+import type { OrderWithItems } from "@/lib/types";
 
 interface OrdersListProps {
-  orders: OrderWithItems[]
-  isDemoMode: boolean
+  orders: OrderWithItems[];
+  isDemoMode: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -22,7 +22,7 @@ const statusColors: Record<string, string> = {
   shipped: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
   delivered: "bg-green-500/10 text-green-600 border-green-500/20",
   cancelled: "bg-red-500/10 text-red-600 border-red-500/20",
-}
+};
 
 const statusJapanese: Record<string, string> = {
   pending: "保留中",
@@ -32,7 +32,7 @@ const statusJapanese: Record<string, string> = {
   shipped: "発送済み",
   delivered: "配達完了",
   cancelled: "キャンセル",
-}
+};
 
 const statuses = [
   { value: "all", label: "All Orders" },
@@ -41,15 +41,15 @@ const statuses = [
   { value: "shipped", label: "Shipped" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
-]
+];
 
 export function OrdersList({ orders, isDemoMode }: OrdersListProps) {
-  const [activeStatus, setActiveStatus] = useState("all")
+  const [activeStatus, setActiveStatus] = useState("all");
 
   const filteredOrders =
     activeStatus === "all"
       ? orders
-      : orders.filter((order) => order.status === activeStatus)
+      : orders.filter((order) => order.status === activeStatus);
 
   return (
     <div>
@@ -96,7 +96,9 @@ export function OrdersList({ orders, isDemoMode }: OrdersListProps) {
                         className={statusColors[order.status] || ""}
                       >
                         {order.status}
-                        <span className="ml-1 text-xs opacity-70">{statusJapanese[order.status]}</span>
+                        <span className="ml-1 text-xs opacity-70">
+                          {statusJapanese[order.status]}
+                        </span>
                       </Badge>
                     </div>
                   </div>
@@ -130,7 +132,9 @@ export function OrdersList({ orders, isDemoMode }: OrdersListProps) {
               </div>
             </div>
             <h3 className="font-medium text-lg mb-1">
-              {activeStatus === "all" ? "No orders yet" : "No orders in this status"}
+              {activeStatus === "all"
+                ? "No orders yet"
+                : "No orders in this status"}
             </h3>
             <p className="text-muted-foreground mb-4">
               {activeStatus === "all"
@@ -146,5 +150,5 @@ export function OrdersList({ orders, isDemoMode }: OrdersListProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }

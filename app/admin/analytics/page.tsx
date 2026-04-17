@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { AnalyticsDashboard } from '@/components/admin/analytics-dashboard'
+import { AnalyticsDashboard } from "@/components/admin/analytics-dashboard";
 
 export default function AdminAnalyticsPage() {
   return (
     <div className="p-6">
       <AnalyticsDashboard />
     </div>
-  )
+  );
 }

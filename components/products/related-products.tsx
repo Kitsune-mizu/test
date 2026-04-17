@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { ProductCard } from "./product-card"
-import { useCartActions } from "@/hooks/use-cart-actions"
-import { useWishlistActions } from "@/hooks/use-wishlist-actions"
-import type { Product } from "@/lib/types"
+import { ProductCard } from "./product-card";
+import { useCartActions } from "@/hooks/use-cart-actions";
+import { useWishlistActions } from "@/hooks/use-wishlist-actions";
+import type { Product } from "@/lib/types";
 
 interface RelatedProductsProps {
-  products: Product[]
+  products: Product[];
 }
 
 export function RelatedProducts({ products }: RelatedProductsProps) {
-  const { addToCart } = useCartActions()
-  const { toggleWishlist, wishlistIds } = useWishlistActions()
+  const { addToCart } = useCartActions();
+  const { toggleWishlist, wishlistIds } = useWishlistActions();
 
   return (
     <div>
@@ -28,5 +28,5 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

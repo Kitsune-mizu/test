@@ -1,39 +1,39 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Minus, Plus, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { formatPrice } from "@/lib/format"
-import { useCartActions } from "@/hooks/use-cart-actions"
+import Image from "next/image";
+import Link from "next/link";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/format";
+import { useCartActions } from "@/hooks/use-cart-actions";
 
 interface CartItem {
-  id: string
-  quantity: number
-  product_id: string
+  id: string;
+  quantity: number;
+  product_id: string;
   products: {
-    id: string
-    name: string
-    slug: string
-    price: number
-    stock: number
-    image_url: string | null
-  } | null
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    stock: number;
+    image_url: string | null;
+  } | null;
 }
 
 interface CartItemsProps {
-  items: CartItem[]
+  items: CartItem[];
 }
 
 export function CartItems({ items }: CartItemsProps) {
-  const { updateQuantity, removeFromCart, loadingId } = useCartActions()
+  const { updateQuantity, removeFromCart, loadingId } = useCartActions();
 
   return (
     <div className="space-y-4">
       {items.map((item) => {
-        if (!item.products) return null
-        const product = item.products
-        const isLoading = loadingId === item.id
+        if (!item.products) return null;
+        const product = item.products;
+        const isLoading = loadingId === item.id;
 
         return (
           <div
@@ -122,8 +122,8 @@ export function CartItems({ items }: CartItemsProps) {
               )}
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

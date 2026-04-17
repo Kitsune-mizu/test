@@ -1,17 +1,19 @@
-import { createClient } from "@/lib/supabase/server"
-import { NextResponse } from "next/server"
-import { formatDate, formatPrice } from "@/lib/format"
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+import { formatDate, formatPrice } from "@/lib/format";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -32,21 +34,18 @@ export async function GET(
           phone,
           address
         )
-      `
+      `,
       )
       .eq("id", params.id)
       .eq("user_id", user.id)
-      .single()
+      .single();
 
     if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     // Generate invoice HTML
-    const invoiceHtml = generateInvoiceHTML(order)
+    const invoiceHtml = generateInvoiceHTML(order);
 
     // Return as HTML/PDF-ready content
     return new NextResponse(invoiceHtml, {
@@ -54,29 +53,34 @@ export async function GET(
         "Content-Type": "text/html; charset=utf-8",
         "Content-Disposition": `attachment; filename="invoice-${order.order_number || order.id}.html"`,
       },
-    })
+    });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to generate invoice" },
-      { status: 500 }
-    )
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to generate invoice",
+      },
+      { status: 500 },
+    );
   }
 }
 
 function generateInvoiceHTML(order: any): string {
-  const orderNumber = order.order_number || `ORD-${order.id.slice(0, 8).toUpperCase()}`
-  const userInfo = order.users && Array.isArray(order.users) ? order.users[0] : order.users
+  const orderNumber =
+    order.order_number || `ORD-${order.id.slice(0, 8).toUpperCase()}`;
+  const userInfo =
+    order.users && Array.isArray(order.users) ? order.users[0] : order.users;
 
-  let subtotal = 0
-  let taxTotal = 0
+  let subtotal = 0;
+  let taxTotal = 0;
 
   const itemsHTML = order.order_items
     .map((item: any) => {
-      const itemSubtotal = item.price * item.quantity
-      const taxRate = item.products?.tax_rate || 0
-      const itemTax = (itemSubtotal * taxRate) / 100
-      subtotal += itemSubtotal
-      taxTotal += itemTax
+      const itemSubtotal = item.price * item.quantity;
+      const taxRate = item.products?.tax_rate || 0;
+      const itemTax = (itemSubtotal * taxRate) / 100;
+      subtotal += itemSubtotal;
+      taxTotal += itemTax;
 
       return `
         <tr>
@@ -90,15 +94,15 @@ function generateInvoiceHTML(order: any): string {
             $${item.price.toFixed(2)}
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-            $${(taxRate).toFixed(2)}%
+            $${taxRate.toFixed(2)}%
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">
             $${(itemSubtotal + itemTax).toFixed(2)}
           </td>
         </tr>
-      `
+      `;
     })
-    .join("")
+    .join("");
 
   return `
     <!DOCTYPE html>
@@ -285,5 +289,5 @@ function generateInvoiceHTML(order: any): string {
       </div>
     </body>
     </html>
-  `
+  `;
 }

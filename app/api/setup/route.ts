@@ -1,21 +1,21 @@
-import { createClient } from "@/lib/supabase/server"
-import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const results = {
     tables_created: false,
     products_seeded: false,
     errors: [] as string[],
-  }
+  };
 
   const demoCredentials = {
     customerEmail: "customer@hikaru.test",
     customerPassword: "DemoPassword123!",
     adminEmail: "admin@hikaru.test",
     adminPassword: "AdminPassword123!",
-  }
+  };
 
   const sampleProducts = [
     {
@@ -69,13 +69,13 @@ export async function GET() {
         "https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?w=500&h=500&fit=crop",
       tags: ["sleeping bag", "camping"],
     },
-  ]
+  ];
 
   try {
     // Check if products table exists
     const { count: productCount, error: countError } = await supabase
       .from("products")
-      .select("*", { count: "exact", head: true })
+      .select("*", { count: "exact", head: true });
 
     if (countError) {
       return NextResponse.json(
@@ -84,21 +84,21 @@ export async function GET() {
           message:
             "Database tables not found. Please run SQL migration scripts first.",
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    results.tables_created = true
+    results.tables_created = true;
 
     // Create demo customer
     const { error: customerError } = await supabase.auth.admin.createUser({
       email: demoCredentials.customerEmail,
       password: demoCredentials.customerPassword,
       email_confirm: true,
-    })
+    });
 
     if (customerError && !customerError.message.includes("already")) {
-      results.errors.push(customerError.message)
+      results.errors.push(customerError.message);
     }
 
     // Create demo admin
@@ -107,18 +107,18 @@ export async function GET() {
         email: demoCredentials.adminEmail,
         password: demoCredentials.adminPassword,
         email_confirm: true,
-      })
+      });
 
     if (adminError && !adminError.message.includes("already")) {
-      results.errors.push(adminError.message)
+      results.errors.push(adminError.message);
     }
 
-    //  SET ROLE ADMIN 
+    //  SET ROLE ADMIN
     if (adminData?.user) {
       await supabase
         .from("users")
         .update({ role: "admin" })
-        .eq("id", adminData.user.id)
+        .eq("id", adminData.user.id);
     }
 
     if (!adminData?.user) {
@@ -126,13 +126,13 @@ export async function GET() {
         .from("users")
         .select("id")
         .eq("email", demoCredentials.adminEmail)
-        .single()
+        .single();
 
       if (existingAdmin) {
         await supabase
           .from("users")
           .update({ role: "admin" })
-          .eq("id", existingAdmin.id)
+          .eq("id", existingAdmin.id);
       }
     }
 
@@ -140,15 +140,15 @@ export async function GET() {
     if (!productCount) {
       const { error: insertError } = await supabase
         .from("products")
-        .insert(sampleProducts)
+        .insert(sampleProducts);
 
       if (insertError) {
-        results.errors.push(insertError.message)
+        results.errors.push(insertError.message);
       } else {
-        results.products_seeded = true
+        results.products_seeded = true;
       }
     } else {
-      results.products_seeded = true
+      results.products_seeded = true;
     }
 
     return NextResponse.json({
@@ -156,14 +156,14 @@ export async function GET() {
       message: "Setup complete!",
       credentials: demoCredentials,
       results,
-    })
+    });
   } catch (error) {
     return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

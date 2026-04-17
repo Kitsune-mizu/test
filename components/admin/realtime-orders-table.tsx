@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRealtimeOrders } from '@/lib/hooks/use-realtime'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState } from "react";
+import { useRealtimeOrders } from "@/lib/hooks/use-realtime";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,61 +10,63 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { formatPrice } from '@/lib/format'
-import { toast } from 'sonner'
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatPrice } from "@/lib/format";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-500/10 text-yellow-600',
-  processing: 'bg-orange-500/10 text-orange-600',
-  confirmed: 'bg-blue-500/10 text-blue-600',
-  preparing: 'bg-purple-500/10 text-purple-600',
-  shipped: 'bg-cyan-500/10 text-cyan-600',
-  delivered: 'bg-green-500/10 text-green-600',
-  cancelled: 'bg-red-500/10 text-red-600',
-}
+  pending: "bg-yellow-500/10 text-yellow-600",
+  processing: "bg-orange-500/10 text-orange-600",
+  confirmed: "bg-blue-500/10 text-blue-600",
+  preparing: "bg-purple-500/10 text-purple-600",
+  shipped: "bg-cyan-500/10 text-cyan-600",
+  delivered: "bg-green-500/10 text-green-600",
+  cancelled: "bg-red-500/10 text-red-600",
+};
 
 const statusJapanese: Record<string, string> = {
-  pending: '保留中',
-  processing: '処理中',
-  confirmed: '確認済',
-  preparing: 'ご準備中',
-  shipped: '発送済み',
-  delivered: '配達完了',
-  cancelled: 'キャンセル',
-}
+  pending: "保留中",
+  processing: "処理中",
+  confirmed: "確認済",
+  preparing: "ご準備中",
+  shipped: "発送済み",
+  delivered: "配達完了",
+  cancelled: "キャンセル",
+};
 
 export function RealtimeOrdersTable() {
-  const { orders, isLoading } = useRealtimeOrders()
-  const [updating, setUpdating] = useState<string | null>(null)
+  const { orders, isLoading } = useRealtimeOrders();
+  const [updating, setUpdating] = useState<string | null>(null);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      setUpdating(orderId)
+      setUpdating(orderId);
       const response = await fetch(`/api/admin/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
-      })
+      });
 
-      if (!response.ok) throw new Error('Failed to update status')
+      if (!response.ok) throw new Error("Failed to update status");
 
-      toast.success('Order status updated')
+      toast.success("Order status updated");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating status')
+      toast.error(
+        error instanceof Error ? error.message : "Error updating status",
+      );
     } finally {
-      setUpdating(orderId)
+      setUpdating(orderId);
     }
-  }
+  };
 
   return (
     <Card>
@@ -119,15 +121,17 @@ export function RealtimeOrdersTable() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={statusColors[order.status] || ''}
+                        className={statusColors[order.status] || ""}
                         variant="outline"
                       >
                         {order.status}
-                        <span className="ml-1 text-xs opacity-70">{statusJapanese[order.status]}</span>
+                        <span className="ml-1 text-xs opacity-70">
+                          {statusJapanese[order.status]}
+                        </span>
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {order.order_number || 'N/A'}
+                      {order.order_number || "N/A"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(order.created_at).toLocaleDateString()}
@@ -144,13 +148,27 @@ export function RealtimeOrdersTable() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">Pending - 保留中</SelectItem>
-                          <SelectItem value="processing">Processing - 処理中</SelectItem>
-                          <SelectItem value="confirmed">Confirmed - 確認済</SelectItem>
-                          <SelectItem value="preparing">Preparing - ご準備中</SelectItem>
-                          <SelectItem value="shipped">Shipped - 発送済み</SelectItem>
-                          <SelectItem value="delivered">Delivered - 配達完了</SelectItem>
-                          <SelectItem value="cancelled">Cancelled - キャンセル</SelectItem>
+                          <SelectItem value="pending">
+                            Pending - 保留中
+                          </SelectItem>
+                          <SelectItem value="processing">
+                            Processing - 処理中
+                          </SelectItem>
+                          <SelectItem value="confirmed">
+                            Confirmed - 確認済
+                          </SelectItem>
+                          <SelectItem value="preparing">
+                            Preparing - ご準備中
+                          </SelectItem>
+                          <SelectItem value="shipped">
+                            Shipped - 発送済み
+                          </SelectItem>
+                          <SelectItem value="delivered">
+                            Delivered - 配達完了
+                          </SelectItem>
+                          <SelectItem value="cancelled">
+                            Cancelled - キャンセル
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -158,7 +176,10 @@ export function RealtimeOrdersTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     No orders yet.
                   </TableCell>
                 </TableRow>
@@ -168,5 +189,5 @@ export function RealtimeOrdersTable() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

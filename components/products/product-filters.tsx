@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { X } from "lucide-react"
+} from "@/components/ui/accordion";
+import { X } from "lucide-react";
 
 interface ProductFiltersProps {
-  categories: string[]
-  brands: string[]
-  currentCategory?: string
-  currentBrand?: string
-  currentSort?: string
-  currentMinPrice?: string
-  currentMaxPrice?: string
+  categories: string[];
+  brands: string[];
+  currentCategory?: string;
+  currentBrand?: string;
+  currentSort?: string;
+  currentMinPrice?: string;
+  currentMaxPrice?: string;
 }
 
 export function ProductFilters({
@@ -39,32 +39,33 @@ export function ProductFilters({
   currentMinPrice,
   currentMaxPrice,
 }: ProductFiltersProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const createQueryString = useCallback(
     (name: string, value: string | null) => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(searchParams.toString());
       if (value === null || value === "") {
-        params.delete(name)
+        params.delete(name);
       } else {
-        params.set(name, value)
+        params.set(name, value);
       }
-      return params.toString()
+      return params.toString();
     },
-    [searchParams]
-  )
+    [searchParams],
+  );
 
   const updateFilter = (name: string, value: string | null) => {
-    const queryString = createQueryString(name, value)
-    router.push(`/products${queryString ? `?${queryString}` : ""}`)
-  }
+    const queryString = createQueryString(name, value);
+    router.push(`/products${queryString ? `?${queryString}` : ""}`);
+  };
 
   const clearAllFilters = () => {
-    router.push("/products")
-  }
+    router.push("/products");
+  };
 
-  const hasActiveFilters = currentCategory || currentBrand || currentMinPrice || currentMaxPrice
+  const hasActiveFilters =
+    currentCategory || currentBrand || currentMinPrice || currentMaxPrice;
 
   return (
     <div className="space-y-6">
@@ -73,7 +74,9 @@ export function ProductFilters({
         <Label>Sort by</Label>
         <Select
           value={currentSort || "newest"}
-          onValueChange={(value) => updateFilter("sort", value === "newest" ? null : value)}
+          onValueChange={(value) =>
+            updateFilter("sort", value === "newest" ? null : value)
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Sort by" />
@@ -92,7 +95,12 @@ export function ProductFilters({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label>Active Filters</Label>
-            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-0 text-xs">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAllFilters}
+              className="h-auto p-0 text-xs"
+            >
               Clear all
             </Button>
           </div>
@@ -123,16 +131,27 @@ export function ProductFilters({
         </div>
       )}
 
-      <Accordion type="multiple" defaultValue={["category", "brand", "price"]} className="w-full">
+      <Accordion
+        type="multiple"
+        defaultValue={["category", "brand", "price"]}
+        className="w-full"
+      >
         {/* Categories */}
         <AccordionItem value="category">
-          <AccordionTrigger className="text-sm font-medium">Category</AccordionTrigger>
+          <AccordionTrigger className="text-sm font-medium">
+            Category
+          </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-1">
               {categories.map((category) => (
                 <button
                   key={category}
-                  onClick={() => updateFilter("category", currentCategory === category ? null : category)}
+                  onClick={() =>
+                    updateFilter(
+                      "category",
+                      currentCategory === category ? null : category,
+                    )
+                  }
                   className={`w-full text-left px-2 py-1.5 text-sm rounded-md transition-colors ${
                     currentCategory === category
                       ? "bg-primary/10 text-primary font-medium"
@@ -148,13 +167,17 @@ export function ProductFilters({
 
         {/* Brands */}
         <AccordionItem value="brand">
-          <AccordionTrigger className="text-sm font-medium">Brand</AccordionTrigger>
+          <AccordionTrigger className="text-sm font-medium">
+            Brand
+          </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-1">
               {brands.map((brand) => (
                 <button
                   key={brand}
-                  onClick={() => updateFilter("brand", currentBrand === brand ? null : brand)}
+                  onClick={() =>
+                    updateFilter("brand", currentBrand === brand ? null : brand)
+                  }
                   className={`w-full text-left px-2 py-1.5 text-sm rounded-md transition-colors ${
                     currentBrand === brand
                       ? "bg-primary/10 text-primary font-medium"
@@ -170,7 +193,9 @@ export function ProductFilters({
 
         {/* Price Range */}
         <AccordionItem value="price">
-          <AccordionTrigger className="text-sm font-medium">Price Range</AccordionTrigger>
+          <AccordionTrigger className="text-sm font-medium">
+            Price Range
+          </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
@@ -179,7 +204,9 @@ export function ProductFilters({
                   type="number"
                   placeholder="0"
                   value={currentMinPrice || ""}
-                  onChange={(e) => updateFilter("minPrice", e.target.value || null)}
+                  onChange={(e) =>
+                    updateFilter("minPrice", e.target.value || null)
+                  }
                   className="h-8"
                 />
               </div>
@@ -189,7 +216,9 @@ export function ProductFilters({
                   type="number"
                   placeholder="1000"
                   value={currentMaxPrice || ""}
-                  onChange={(e) => updateFilter("maxPrice", e.target.value || null)}
+                  onChange={(e) =>
+                    updateFilter("maxPrice", e.target.value || null)
+                  }
                   className="h-8"
                 />
               </div>
@@ -198,5 +227,5 @@ export function ProductFilters({
         </AccordionItem>
       </Accordion>
     </div>
-  )
+  );
 }

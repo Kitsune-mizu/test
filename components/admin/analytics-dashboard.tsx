@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
+} from "recharts";
 import {
   LineChart,
   Line,
@@ -24,47 +24,47 @@ import {
   Tooltip as RechartsTooltip,
   Legend as RechartsLegend,
   ResponsiveContainer as RechartsResponsiveContainer,
-} from 'recharts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { TrendingUp, DollarSign, ShoppingCart, Users } from 'lucide-react'
-import { formatPrice } from '@/lib/format'
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, DollarSign, ShoppingCart, Users } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 
 interface AnalyticsData {
-  ordersChartData: Array<{ date: string; orders: number }>
-  revenueChartData: Array<{ date: string; revenue: number }>
-  topProductsData: Array<{ name: string; sales: number }>
-  customersChartData: Array<{ date: string; customers: number }>
-  totalOrders: number
-  totalRevenue: number
-  totalCustomers: number
+  ordersChartData: Array<{ date: string; orders: number }>;
+  revenueChartData: Array<{ date: string; revenue: number }>;
+  topProductsData: Array<{ name: string; sales: number }>;
+  customersChartData: Array<{ date: string; customers: number }>;
+  totalOrders: number;
+  totalRevenue: number;
+  totalCustomers: number;
 }
 
 export function AnalyticsDashboard() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch('/api/admin/analytics')
-        if (!response.ok) throw new Error('Failed to fetch analytics')
-        const data = await response.json()
-        setAnalytics(data)
+        setIsLoading(true);
+        const response = await fetch("/api/admin/analytics");
+        if (!response.ok) throw new Error("Failed to fetch analytics");
+        const data = await response.json();
+        setAnalytics(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error')
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchAnalytics()
-  }, [])
+    fetchAnalytics();
+  }, []);
 
   if (error) {
-    return <div className="text-destructive">Error: {error}</div>
+    return <div className="text-destructive">Error: {error}</div>;
   }
 
   return (
@@ -91,7 +91,9 @@ export function AnalyticsDashboard() {
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold">{analytics?.totalOrders || 0}</div>
+                <div className="text-2xl font-bold">
+                  {analytics?.totalOrders || 0}
+                </div>
                 <p className="text-xs text-muted-foreground">All time</p>
               </>
             )}
@@ -115,7 +117,9 @@ export function AnalyticsDashboard() {
                 <div className="text-2xl font-bold">
                   {formatPrice(analytics?.totalRevenue || 0)}
                 </div>
-                <p className="text-xs text-muted-foreground">Delivered orders</p>
+                <p className="text-xs text-muted-foreground">
+                  Delivered orders
+                </p>
               </>
             )}
           </CardContent>
@@ -135,8 +139,12 @@ export function AnalyticsDashboard() {
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold">{analytics?.totalCustomers || 0}</div>
-                <p className="text-xs text-muted-foreground">Registered users</p>
+                <div className="text-2xl font-bold">
+                  {analytics?.totalCustomers || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Registered users
+                </p>
               </>
             )}
           </CardContent>
@@ -163,7 +171,9 @@ export function AnalyticsDashboard() {
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 12 }}
-                    interval={Math.floor((analytics?.ordersChartData.length || 0) / 6)}
+                    interval={Math.floor(
+                      (analytics?.ordersChartData.length || 0) / 6,
+                    )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
                   <RechartsTooltip />
@@ -199,7 +209,9 @@ export function AnalyticsDashboard() {
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 12 }}
-                    interval={Math.floor((analytics?.revenueChartData.length || 0) / 6)}
+                    interval={Math.floor(
+                      (analytics?.revenueChartData.length || 0) / 6,
+                    )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
                   <RechartsTooltip
@@ -265,7 +277,9 @@ export function AnalyticsDashboard() {
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 12 }}
-                    interval={Math.floor((analytics?.customersChartData.length || 0) / 6)}
+                    interval={Math.floor(
+                      (analytics?.customersChartData.length || 0) / 6,
+                    )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
                   <RechartsTooltip />
@@ -284,5 +298,5 @@ export function AnalyticsDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

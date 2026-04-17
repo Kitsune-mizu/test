@@ -3,6 +3,7 @@
 ## Payment Methods Endpoints
 
 ### Get All Payment Methods
+
 ```
 GET /api/payment-methods
 Authentication: Required
@@ -10,6 +11,7 @@ Response: Array of SavedPaymentMethod
 ```
 
 Example Response:
+
 ```json
 [
   {
@@ -29,6 +31,7 @@ Example Response:
 ```
 
 ### Create Payment Method
+
 ```
 POST /api/payment-methods
 Authentication: Required
@@ -49,6 +52,7 @@ Error: { "error": "message" } (400/500)
 ```
 
 ### Update Payment Method
+
 ```
 PATCH /api/payment-methods/{id}
 Authentication: Required
@@ -65,6 +69,7 @@ Error: { "error": "message" } (401/404/500)
 ```
 
 ### Delete Payment Method
+
 ```
 DELETE /api/payment-methods/{id}
 Authentication: Required
@@ -75,6 +80,7 @@ Error: { "error": "message" } (401/404/500)
 ## Order Endpoints
 
 ### Get Order Invoice
+
 ```
 GET /api/orders/{orderId}/invoice
 Authentication: Required
@@ -82,17 +88,19 @@ Response: HTML document (invoice-{orderNumber}.html)
 ```
 
 Usage in Component:
+
 ```typescript
-const response = await fetch(`/api/orders/${orderId}/invoice`)
-const html = await response.text()
+const response = await fetch(`/api/orders/${orderId}/invoice`);
+const html = await response.text();
 // Either display in new window or download as file
 ```
 
 ## Order Actions (Server Functions)
 
 ### Create Order
+
 ```typescript
-import { createOrderAction } from "@/app/actions/orders"
+import { createOrderAction } from "@/app/actions/orders";
 
 const result = await createOrderAction({
   totalPrice: 299.99,
@@ -103,10 +111,10 @@ const result = await createOrderAction({
     {
       product_id: "uuid",
       quantity: 1,
-      price: 299.99
-    }
-  ]
-})
+      price: 299.99,
+    },
+  ],
+});
 
 // Response:
 // Success: { success: true, orderId: "ORD-..." }
@@ -114,10 +122,11 @@ const result = await createOrderAction({
 ```
 
 ### Cancel Order
-```typescript
-import { cancelOrderAction } from "@/app/actions/orders"
 
-const result = await cancelOrderAction(orderId)
+```typescript
+import { cancelOrderAction } from "@/app/actions/orders";
+
+const result = await cancelOrderAction(orderId);
 
 // Response:
 // Success: { success: true }
@@ -127,44 +136,55 @@ const result = await cancelOrderAction(orderId)
 ## Database Types
 
 ### SavedPaymentMethod
+
 ```typescript
 interface SavedPaymentMethod {
-  id: string
-  user_id: string
-  method_type: 'card' | 'bank_account'
-  card_number: string | null // Last 4 digits masked
-  card_holder: string | null
-  card_brand: string | null // Mastercard, Visa, Citrus, etc.
-  expiry_date: string | null // MM/YY format
-  is_default: boolean
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  method_type: "card" | "bank_account";
+  card_number: string | null; // Last 4 digits masked
+  card_holder: string | null;
+  card_brand: string | null; // Mastercard, Visa, Citrus, etc.
+  expiry_date: string | null; // MM/YY format
+  is_default: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
 ### Product (Extended)
+
 ```typescript
 interface Product {
   // ... existing fields
-  tax_rate: number // Percentage (0-100)
-  payment_methods: string[] // Array of payment methods: 'card', 'cod'
+  tax_rate: number; // Percentage (0-100)
+  payment_methods: string[]; // Array of payment methods: 'card', 'cod'
 }
 ```
 
 ### Order (Extended)
+
 ```typescript
 interface Order {
   // ... existing fields
-  status: 'pending' | 'processing' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled'
-  order_number: string | null // e.g., ORD-1704067200000-ABC123XY
-  invoice_url: string | null // URL reference to invoice
+  status:
+    | "pending"
+    | "processing"
+    | "confirmed"
+    | "preparing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
+  order_number: string | null; // e.g., ORD-1704067200000-ABC123XY
+  invoice_url: string | null; // URL reference to invoice
 }
 ```
 
 ## Supported Payment Methods
 
 ### Card Brands
+
 - visa
 - mastercard
 - citrus
@@ -172,22 +192,26 @@ interface Order {
 - discover
 
 ### Payment Method Types
+
 - card: Credit/debit card payments
 - cod: Cash on Delivery
 
 ## Order Status Flow
 
 ### Demo Account Orders
+
 ```
 pending/processing → confirmed → [ready for shipping]
 ```
 
 ### Real Account Orders
+
 ```
 pending → [payment confirmation] → confirmed → preparing → shipped → delivered
 ```
 
 ### Cancellable Statuses
+
 Orders can be cancelled only when in: `pending` or `confirmed` status
 
 ## Error Handling
@@ -223,6 +247,7 @@ Orders can be cancelled only when in: `pending` or `confirmed` status
 ## Webhook Integration (Future)
 
 When implementing webhook support for payment providers:
+
 - Use `/api/orders/{orderId}` as webhook endpoint
 - Update order status based on payment provider confirmation
 - Trigger notifications for status changes
@@ -231,13 +256,16 @@ When implementing webhook support for payment providers:
 ## Testing
 
 ### Demo Credentials
+
 - Email: `customer@hikaru.test`
 - Password: `DemoPassword123!`
 
 ### Test Payment Cards
+
 See demo.ts for available test card numbers
 
 ### Manual Testing Steps
+
 1. Create order → Check order_number generation
 2. Add payment method → Verify storage and masking
 3. Generate invoice → Validate HTML output

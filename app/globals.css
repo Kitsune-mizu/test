@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -13,57 +13,57 @@
   /* Core Colors */
   --background: #ffffff;
   --foreground: #000000;
-  
+
   /* Card & Popover */
   --card: #ffffff;
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
-  
+
   /* Primary - Red Accent */
-  --primary: #E10600;
+  --primary: #e10600;
   --primary-foreground: #ffffff;
-  
+
   /* Secondary - Light Gray */
   --secondary: #f5f5f5;
   --secondary-foreground: #000000;
-  
+
   /* Muted - Neutral Tones */
   --muted: #f5f5f5;
   --muted-foreground: #737373;
-  
+
   /* Accent - Red */
-  --accent: #E10600;
+  --accent: #e10600;
   --accent-foreground: #ffffff;
-  
+
   /* Destructive */
-  --destructive: #E10600;
+  --destructive: #e10600;
   --destructive-foreground: #ffffff;
-  
+
   /* Borders & Input */
   --border: #e5e5e5;
   --input: #f5f5f5;
-  --ring: #E10600;
-  
+  --ring: #e10600;
+
   /* Charts */
-  --chart-1: #E10600;
+  --chart-1: #e10600;
   --chart-2: #000000;
   --chart-3: #737373;
   --chart-4: #d4d4d4;
   --chart-5: #f5f5f5;
-  
+
   /* Radius */
   --radius: 0px;
-  
+
   /* Sidebar - Dark */
   --sidebar: #000000;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #E10600;
+  --sidebar-primary: #e10600;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #262626;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #262626;
-  --sidebar-ring: #E10600;
+  --sidebar-ring: #e10600;
 }
 
 .dark {
@@ -73,38 +73,38 @@
   --card-foreground: #ffffff;
   --popover: #0a0a0a;
   --popover-foreground: #ffffff;
-  --primary: #E10600;
+  --primary: #e10600;
   --primary-foreground: #ffffff;
   --secondary: #262626;
   --secondary-foreground: #ffffff;
   --muted: #262626;
   --muted-foreground: #a3a3a3;
-  --accent: #E10600;
+  --accent: #e10600;
   --accent-foreground: #ffffff;
-  --destructive: #E10600;
+  --destructive: #e10600;
   --destructive-foreground: #ffffff;
   --border: #262626;
   --input: #171717;
-  --ring: #E10600;
-  --chart-1: #E10600;
+  --ring: #e10600;
+  --chart-1: #e10600;
   --chart-2: #ffffff;
   --chart-3: #a3a3a3;
   --chart-4: #525252;
   --chart-5: #262626;
   --sidebar: #0a0a0a;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #E10600;
+  --sidebar-primary: #e10600;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #171717;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #171717;
-  --sidebar-ring: #E10600;
+  --sidebar-ring: #e10600;
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Inter Fallback', system-ui, sans-serif;
-  --font-heading: 'Outfit', 'Outfit Fallback', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
+  --font-heading: "Outfit", "Outfit Fallback", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -150,10 +150,10 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
-  
+
   /* Custom Selection Color */
   ::selection {
-    background-color: #E10600;
+    background-color: #e10600;
     color: #ffffff;
   }
 }
@@ -163,21 +163,21 @@
     scrollbar-width: thin;
     scrollbar-color: #d4d4d4 transparent;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: #d4d4d4;
     border-radius: 3px;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: #a3a3a3;
   }

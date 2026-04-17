@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "next/image";
 
 export function AboutDan() {
   return (
@@ -27,19 +27,21 @@ export function AboutDan() {
           {/* Body in Japanese */}
           <p className="text-neutral-600 leading-relaxed max-w-2xl text-base">
             光る冒険（ヒカル・ボウケン）は、山、トレイル、そして東南アジアをはじめとする世界中の自然を探検してきた情熱的なアウトドア愛好家によって設立されました。
-            品質の高い職人技と探検の精神への愛情に駆り立てられ — <span className="text-black font-medium">光る冒険</span> — 
+            品質の高い職人技と探検の精神への愛情に駆り立てられ —{" "}
+            <span className="text-black font-medium">光る冒険</span> —
             このプラットフォームは、真に優れたパフォーマンスを発揮するギアと冒険家をつなぐために作られました。
           </p>
           <p className="text-neutral-600 leading-relaxed max-w-2xl text-base">
             光る冒険カタログのすべての製品は、耐久性、快適さ、パフォーマンスについて個別に評価されています。
-            テクニカルなハイキングシューズから遠征グレードのバックパックまで、各アイテムは旅への献身を反映しています — 
-            <span className="italic text-neutral-500">旅 (tabi)</span>。
+            テクニカルなハイキングシューズから遠征グレードのバックパックまで、各アイテムは旅への献身を反映しています
+            —<span className="italic text-neutral-500">旅 (tabi)</span>。
           </p>
 
           {/* Quote */}
           <blockquote className="mt-4 border-l-2 border-[#E10600] pl-6 text-left max-w-xl">
             <p className="text-neutral-700 italic text-lg leading-relaxed">
-              「山はあなたがどれだけ準備しているかを気にしません — しかし私は気にします。」
+              「山はあなたがどれだけ準備しているかを気にしません —
+              しかし私は気にします。」
             </p>
             <p className="text-neutral-500 italic text-sm mt-1">
               "The mountain does not care how prepared you are — but I do."
@@ -73,5 +75,5 @@ export function AboutDan() {
         </div>
       </div>
     </section>
-  )
+  );
 }
