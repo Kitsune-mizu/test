@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRealtimeNotifications } from '@/lib/hooks/use-realtime'
+import { NotificationItem } from './notification-item'
 import {
   Sheet,
   SheetContent,
@@ -13,8 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Bell, Trash2, Check } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { Bell, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Notification {
@@ -29,13 +29,17 @@ interface Notification {
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>('customer')
   const { notifications, unreadCount } = useRealtimeNotifications(userId)
   const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      setUserId(user?.id || null)
+      if (user) {
+        setUserId(user.id)
+        setUserRole(user.user_metadata?.role || 'customer')
+      }
     }
     getUser()
   }, [supabase])
@@ -49,7 +53,7 @@ export function NotificationCenter() {
       })
 
       if (!response.ok) throw new Error('Failed to update notification')
-      toast.success('Notification updated')
+      toast.success(isRead ? 'Marked as unread' : 'Marked as read')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error')
     }
@@ -68,16 +72,39 @@ export function NotificationCenter() {
     }
   }
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'order_status':
-        return '📦'
-      case 'payment':
-        return '💳'
-      case 'alert':
-        return '⚠️'
-      default:
-        return '🔔'
+  const handleMarkAllAsRead = async () => {
+    try {
+      const unreadNotifications = notifications.filter((n) => !n.read_status)
+      
+      await Promise.all(
+        unreadNotifications.map((n) =>
+          fetch(`/api/notifications/${n.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ read_status: true }),
+          })
+        )
+      )
+      
+      toast.success('All notifications marked as read')
+    } catch (error) {
+      toast.error('Failed to mark all as read')
+    }
+  }
+
+  const handleClearAll = async () => {
+    try {
+      await Promise.all(
+        notifications.map((n) =>
+          fetch(`/api/notifications/${n.id}`, {
+            method: 'DELETE',
+          })
+        )
+      )
+      
+      toast.success('All notifications cleared')
+    } catch (error) {
+      toast.error('Failed to clear notifications')
     }
   }
 
@@ -89,10 +116,11 @@ export function NotificationCenter() {
         size="icon"
         onClick={() => setIsOpen(true)}
         className="relative"
+        title="Notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-destructive">
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-white text-xs">
             {unreadCount > 9 ? '9+' : unreadCount}
           </Badge>
         )}
@@ -100,76 +128,46 @@ export function NotificationCenter() {
 
       {/* Notification Sheet */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="w-full sm:w-96">
-          <SheetHeader>
-            <SheetTitle>Notifications</SheetTitle>
+        <SheetContent className="w-full sm:w-96 flex flex-col">
+          <SheetHeader className="border-b pb-3">
+            <div className="flex items-center justify-between">
+              <SheetTitle>Notifications {userRole === 'admin' && '(管理者)'}</SheetTitle>
+              {notifications.length > 0 && (
+                <div className="flex gap-2">
+                  {unreadCount > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleMarkAllAsRead}
+                      className="text-xs h-8"
+                    >
+                      Mark all read
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearAll}
+                    className="text-xs h-8 text-destructive"
+                  >
+                    Clear all
+                  </Button>
+                </div>
+              )}
+            </div>
           </SheetHeader>
 
-          <ScrollArea className="h-full mt-4">
+          <ScrollArea className="flex-1 mt-4">
             {notifications.length > 0 ? (
-              <div className="space-y-1 pr-4">
-                {notifications.map((notification: Notification, index) => (
+              <div className="space-y-2 pr-4">
+                {notifications.map((notification: Notification) => (
                   <div key={notification.id}>
-                    <div
-                      className={`p-3 rounded-lg space-y-2 ${
-                        notification.read_status
-                          ? 'bg-muted/50'
-                          : 'bg-primary/5 border border-primary/20'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <p className="flex items-center gap-2">
-                            <span>{getNotificationIcon(notification.type)}</span>
-                            <span className="text-sm font-medium">
-                              {notification.message}
-                            </span>
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {formatDistanceToNow(new Date(notification.created_at), {
-                              addSuffix: true,
-                            })}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleMarkAsRead(notification.id, notification.read_status)
-                            }
-                          >
-                            {notification.read_status ? (
-                              <Check className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <Badge className="h-2 w-2 rounded-full p-0" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(notification.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {notification.link && (
-                        <Button
-                          variant="link"
-                          size="sm"
-                          className="p-0 h-auto"
-                          onClick={() => {
-                            window.location.href = notification.link || '/'
-                          }}
-                        >
-                          View Details →
-                        </Button>
-                      )}
-                    </div>
-                    {index < notifications.length - 1 && <Separator className="my-1" />}
+                    <NotificationItem
+                      notification={notification}
+                      userRole={userRole}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                    />
                   </div>
                 ))}
               </div>
@@ -179,6 +177,13 @@ export function NotificationCenter() {
               </div>
             )}
           </ScrollArea>
+
+          {/* Footer info */}
+          <div className="border-t pt-3 text-xs text-neutral-500">
+            {notifications.length > 0 && (
+              <p>{notifications.filter((n) => !n.read_status).length} unread</p>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
     </>

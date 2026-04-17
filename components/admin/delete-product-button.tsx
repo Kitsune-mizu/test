@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Loader2, Trash2 } from "lucide-react"
 import {
@@ -24,6 +25,7 @@ export function DeleteProductButton({
   productName,
   onDeleteSuccess,
 }: DeleteProductButtonProps) {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -44,6 +46,9 @@ export function DeleteProductButton({
       toast.success("Product deleted successfully")
       setIsOpen(false)
       onDeleteSuccess?.()
+      
+      // Refresh the products list
+      router.refresh()
     } catch (error) {
       toast.error("An error occurred while deleting the product")
       console.error("[v0] Delete error:", error)

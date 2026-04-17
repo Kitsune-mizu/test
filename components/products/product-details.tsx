@@ -11,6 +11,8 @@ import type { Product } from "@/lib/types"
 import { formatPrice } from "@/lib/format"
 import { useCartActions } from "@/hooks/use-cart-actions"
 import { useWishlistActions } from "@/hooks/use-wishlist-actions"
+import { FloatingCartItem } from "@/components/cart/floating-cart-item"
+import { createPortal } from "react-dom"
 
 interface ProductDetailsProps {
   product: Product
@@ -21,8 +23,9 @@ interface ProductDetailsProps {
 export function ProductDetails({ product, isInWishlist: initialWishlist, isLoggedIn }: ProductDetailsProps) {
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(initialWishlist)
-  const { addToCart, isLoading: cartLoading } = useCartActions()
+  const { addToCart, isLoading: cartLoading, showFloatingItem } = useCartActions()
   const { toggleWishlist } = useWishlistActions()
+  const [hideFloating, setHideFloating] = useState(false)
 
   const isOutOfStock = product.stock === 0
   const maxQuantity = Math.min(product.stock, 10)
@@ -35,6 +38,16 @@ export function ProductDetails({ product, isInWishlist: initialWishlist, isLogge
     toggleWishlist(product.id)
     setIsWishlisted(!isWishlisted)
   }
+
+  return (
+    <div>
+      {/* Floating animation portal */}
+      {showFloatingItem && !hideFloating && typeof document !== 'undefined' && (
+        createPortal(
+          <FloatingCartItem onComplete={() => setHideFloating(true)} />,
+          document.body
+        )
+      )}
 
   return (
     <div>

@@ -33,6 +33,16 @@ const statusColors: Record<string, string> = {
   cancelled: 'bg-red-500/10 text-red-600',
 }
 
+const statusJapanese: Record<string, string> = {
+  pending: '保留中',
+  processing: '処理中',
+  confirmed: '確認済',
+  preparing: 'ご準備中',
+  shipped: '発送済み',
+  delivered: '配達完了',
+  cancelled: 'キャンセル',
+}
+
 export function RealtimeOrdersTable() {
   const { orders, isLoading } = useRealtimeOrders()
   const [updating, setUpdating] = useState<string | null>(null)
@@ -113,6 +123,7 @@ export function RealtimeOrdersTable() {
                         variant="outline"
                       >
                         {order.status}
+                        <span className="ml-1 text-xs opacity-70">{statusJapanese[order.status]}</span>
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
@@ -133,13 +144,13 @@ export function RealtimeOrdersTable() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="processing">Processing</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="preparing">Preparing</SelectItem>
-                          <SelectItem value="shipped">Shipped</SelectItem>
-                          <SelectItem value="delivered">Delivered</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="pending">Pending - 保留中</SelectItem>
+                          <SelectItem value="processing">Processing - 処理中</SelectItem>
+                          <SelectItem value="confirmed">Confirmed - 確認済</SelectItem>
+                          <SelectItem value="preparing">Preparing - ご準備中</SelectItem>
+                          <SelectItem value="shipped">Shipped - 発送済み</SelectItem>
+                          <SelectItem value="delivered">Delivered - 配達完了</SelectItem>
+                          <SelectItem value="cancelled">Cancelled - キャンセル</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

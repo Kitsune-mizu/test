@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { HikaruLogoMinimal } from "@/components/ui/hikaru-logo"
 import { createClient } from "@/lib/supabase/client"
+import { NotificationCenter } from "@/components/notifications/notification-center"
 // SheetTitle & SheetDescription must be static (Radix a11y requirement)
 import { SheetTitle, SheetDescription } from "@/components/ui/sheet"
 
@@ -370,6 +371,11 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
 
           {/* ── Right-side icons ───────────────────────────────────────────── */}
           <div className="flex items-center gap-1">
+
+            {/* Notifications — logged in only */}
+            {currentUser && mounted && (
+              <NotificationCenter />
+            )}
 
             {/* Wishlist — logged in only */}
             {currentUser && (

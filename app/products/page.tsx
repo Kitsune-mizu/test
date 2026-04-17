@@ -1,8 +1,10 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ProductsGrid } from "@/components/products/products-grid"
 import { ProductFilters } from "@/components/products/product-filters"
+import { JapaneseSkeleton } from "@/components/loaders/japanese-loader"
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -95,37 +97,39 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     <div className="flex min-h-screen flex-col">
       <Header user={user} cartCount={cartCount} />
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="font-heading text-3xl font-bold">
-              {params.category || "All Products"}
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              {products?.length || 0} products found
-            </p>
-          </div>
+        <Suspense fallback={<JapaneseSkeleton />}>
+          <div className="container mx-auto px-4 py-8">
+            {/* Page Header */}
+            <div className="mb-8">
+              <h1 className="font-heading text-3xl font-bold">
+                {params.category || "All Products"}
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                {products?.length || 0} products found
+              </p>
+            </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Filters Sidebar */}
-            <aside className="w-full lg:w-64 shrink-0">
-              <ProductFilters
-                categories={categories as string[]}
-                brands={brands as string[]}
-                currentCategory={params.category}
-                currentBrand={params.brand}
-                currentSort={params.sort}
-                currentMinPrice={params.minPrice}
-                currentMaxPrice={params.maxPrice}
-              />
-            </aside>
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Filters Sidebar */}
+              <aside className="w-full lg:w-64 shrink-0">
+                <ProductFilters
+                  categories={categories as string[]}
+                  brands={brands as string[]}
+                  currentCategory={params.category}
+                  currentBrand={params.brand}
+                  currentSort={params.sort}
+                  currentMinPrice={params.minPrice}
+                  currentMaxPrice={params.maxPrice}
+                />
+              </aside>
 
-            {/* Products Grid */}
-            <div className="flex-1">
-              <ProductsGrid products={products || []} />
+              {/* Products Grid */}
+              <div className="flex-1">
+                <ProductsGrid products={products || []} />
+              </div>
             </div>
           </div>
-        </div>
+        </Suspense>
       </main>
       <Footer />
     </div>

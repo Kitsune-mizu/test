@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const supabase = await createClient()
@@ -22,7 +22,7 @@ export async function PATCH(
     const { data: updatedOrder, error: updateError } = await supabase
       .from('orders')
       .update({ status })
-      .eq('id', params.orderId)
+      .eq('id', params.id)
       .select()
       .single()
 
@@ -44,7 +44,7 @@ export async function PATCH(
         user_id: updatedOrder.user_id,
         message: statusMessages[status] || `Order status updated to ${status}`,
         type: 'order_status',
-        link: `/account/orders/${params.orderId}`,
+        link: `/account/orders/${params.id}`,
       })
     }
 
@@ -57,3 +57,4 @@ export async function PATCH(
     )
   }
 }
+

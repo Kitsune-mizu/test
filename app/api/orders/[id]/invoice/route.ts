@@ -4,7 +4,7 @@ import { formatDate, formatPrice } from "@/lib/format"
 
 export async function GET(
   request: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: { id: string } }
 ) {
   const supabase = await createClient()
 
@@ -34,7 +34,7 @@ export async function GET(
         )
       `
       )
-      .eq("id", params.orderId)
+      .eq("id", params.id)
       .eq("user_id", user.id)
       .single()
 

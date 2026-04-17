@@ -1,8 +1,10 @@
 'use client'
 
+import { Suspense } from 'react'
 import { DashboardStats } from '@/components/admin/dashboard-stats'
 import { RecentOrders } from '@/components/admin/recent-orders'
 import { LowStockAlerts } from '@/components/admin/low-stock-alerts'
+import { JapaneseSkeleton } from '@/components/loaders/japanese-loader'
 
 export default function AdminDashboard() {
   return (
@@ -13,14 +15,16 @@ export default function AdminDashboard() {
         <p className="text-muted-foreground">Welcome back! Here&apos;s your store overview.</p>
       </div>
 
-      {/* Stats Grid */}
-      <DashboardStats />
+      <Suspense fallback={<JapaneseSkeleton />}>
+        {/* Stats Grid */}
+        <DashboardStats />
 
-      {/* Recent Orders */}
-      <RecentOrders />
+        {/* Recent Orders */}
+        <RecentOrders />
 
-      {/* Low Stock Alert */}
-      <LowStockAlerts />
+        {/* Low Stock Alert */}
+        <LowStockAlerts />
+      </Suspense>
     </div>
   )
 }

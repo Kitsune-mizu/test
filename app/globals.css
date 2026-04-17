@@ -158,7 +158,6 @@
   }
 }
 
-/* Custom Scrollbar */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -181,5 +180,20 @@
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: #a3a3a3;
+  }
+}
+
+@keyframes floatToCart {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -100px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -200px) scale(0.5);
   }
 }

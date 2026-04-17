@@ -4,6 +4,12 @@ import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { isDemoAccount } from "@/lib/demo"
 import { generateOrderId } from "@/lib/order-id"
+import {
+  notifyAdminsNewOrder,
+  createOrderConfirmedNotification,
+} from "@/lib/helpers/notification-helpers"
+import { deductStock } from "@/lib/helpers/stock-helpers"
+import { sendOrderConfirmationEmail } from "@/lib/helpers/email-helpers"
 
 interface OrderItem {
   product_id: string
@@ -97,6 +103,44 @@ export async function createOrderAction(params: CreateOrderParams) {
       .from("orders")
       .update({ status: "confirmed" })
       .eq("id", order.id)
+  }
+
+  // Notify admins about new order
+  try {
+    const { data: customerProfile } = await supabase
+      .from("users")
+      .select("name")
+      .eq("id", user.id)
+      .single()
+
+    await notifyAdminsNewOrder(
+      orderId,
+      customerProfile?.name || "Customer",
+      params.totalPrice
+    )
+  } catch (error) {
+    console.error("[v0] Failed to notify admins:", error)
+  }
+
+  // Notify customer - send order confirmation email
+  try {
+    const { data: userProfile } = await supabase
+      .from("users")
+      .select("name, email")
+      .eq("id", user.id)
+      .single()
+
+    if (userProfile?.email) {
+      await sendOrderConfirmationEmail(userProfile.email, {
+        orderNumber,
+        customerName: userProfile?.name || "Customer",
+        totalPrice: params.totalPrice,
+        items: params.items,
+        orderId: order.id,
+      })
+    }
+  } catch (error) {
+    console.error("[v0] Failed to send order confirmation email:", error)
   }
 
   // Create notification

@@ -3,10 +3,12 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ShieldCheck } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ShieldCheck, Lock } from "lucide-react"
 import { ChangePasswordForm } from "@/components/account/change-password-form"
 import { PaymentMethodsList } from "@/components/account/payment-methods-list"
 import type { SavedPaymentMethod } from "@/lib/types"
@@ -105,6 +107,25 @@ export default function CustomerSettingsPage() {
               Keep your password secure and never share it with anyone.
             </AlertDescription>
           </Alert>
+          
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium text-foreground flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-primary" />
+                  Change Password
+                </h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Update your password to keep your account secure
+                </p>
+              </div>
+              <Link href="/auth/change-password">
+                <Button variant="outline" size="sm">
+                  Change Password
+                </Button>
+              </Link>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

@@ -15,7 +15,6 @@ export async function GET(request: Request) {
       .from("saved_payment_methods")
       .select("*")
       .eq("user_id", user.id)
-      .eq("is_active", true)
       .order("is_default", { ascending: false })
 
     if (error) throw error
@@ -72,11 +71,11 @@ export async function POST(request: Request) {
           user_id: user.id,
           method_type,
           card_number: `****-****-****-${card_number.slice(-4)}`,
-          card_holder,
-          card_brand,
-          expiry_date,
+          card_holder_name: card_holder,
+          card_type: card_brand,
+          expiry_month: parseInt(expiry_date.split("/")[0]),
+          expiry_year: parseInt(expiry_date.split("/")[1]),
           is_default: is_default || false,
-          is_active: true,
         },
       ])
       .select()

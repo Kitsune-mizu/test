@@ -9,8 +9,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "sonner"
 import { createOrderAction } from "@/app/actions/orders"
+import { validateStock } from "@/lib/helpers/stock-helpers"
+import { checkRateLimit } from "@/lib/helpers/security-helpers"
 import { CreditCard, Truck, Loader2, AlertCircle } from "lucide-react"
 import type { User } from "@/lib/types"
 import { isDemoAccount, DEMO_CARDS } from "@/lib/demo"
@@ -61,6 +64,13 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
       return
     }
 
+    // Rate limit checkout attempts
+    const rateLimitCheck = await checkRateLimit('checkout')
+    if (!rateLimitCheck.allowed) {
+      toast.error("Too many checkout attempts. Please try again later.")
+      return
+    }
+
     setIsSubmitting(true)
 
     // Prepare order items
@@ -71,6 +81,21 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
         quantity: item.quantity,
         price: item.products!.price,
       }))
+
+    // Validate stock before processing order
+    const stockValidation = await validateStock(orderItems)
+    if (!stockValidation.isValid) {
+      if (stockValidation.insufficientItems && stockValidation.insufficientItems.length > 0) {
+        const itemsList = stockValidation.insufficientItems
+          .map((item) => `${item.productName} (requested: ${item.requested}, available: ${item.available})`)
+          .join(", ")
+        toast.error(`Out of stock: ${itemsList}`)
+      } else {
+        toast.error(stockValidation.message || "Stock validation failed")
+      }
+      setIsSubmitting(false)
+      return
+    }
 
     const result = await createOrderAction({
       totalPrice: total,
@@ -85,11 +110,8 @@ export function CheckoutForm({ user, cartItems, total }: CheckoutFormProps) {
       setIsSubmitting(false)
     } else {
       toast.success("Order placed successfully!")
-      // Redirect to success page for demo accounts, otherwise to order detail
-      const successPath = isDemoMode
-        ? `/account/orders/${result.orderId}/success`
-        : `/account/orders/${result.orderId}`
-      router.push(successPath)
+      // Redirect to success page
+      router.push(`/checkout/success?orderId=${result.orderId}`)
     }
   }
 

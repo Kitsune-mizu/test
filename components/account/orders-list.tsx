@@ -24,6 +24,16 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-red-500/10 text-red-600 border-red-500/20",
 }
 
+const statusJapanese: Record<string, string> = {
+  pending: "保留中",
+  processing: "処理中",
+  confirmed: "確認済",
+  preparing: "ご準備中",
+  shipped: "発送済み",
+  delivered: "配達完了",
+  cancelled: "キャンセル",
+}
+
 const statuses = [
   { value: "all", label: "All Orders" },
   { value: "processing", label: "Processing" },
@@ -86,6 +96,7 @@ export function OrdersList({ orders, isDemoMode }: OrdersListProps) {
                         className={statusColors[order.status] || ""}
                       >
                         {order.status}
+                        <span className="ml-1 text-xs opacity-70">{statusJapanese[order.status]}</span>
                       </Badge>
                     </div>
                   </div>

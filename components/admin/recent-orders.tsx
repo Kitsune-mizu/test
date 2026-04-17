@@ -73,7 +73,7 @@ export function RecentOrders() {
             ))
           ) : orders.length > 0 ? (
             orders.map((order) => (
-              <Link key={order.id} href={`/admin/orders/${order.id}`}>
+              <Link key={order.id} href={`/admin/orders`}>
                 <div className="flex items-center justify-between border-b pb-3 last:border-0 hover:bg-muted/50 p-2 rounded cursor-pointer transition-colors">
                   <div>
                     <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
