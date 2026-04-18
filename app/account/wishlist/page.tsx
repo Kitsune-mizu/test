@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Empty } from "@/components/ui/empty";
 import { ProductCard } from "@/components/products/product-card";
 import { Heart } from "lucide-react";

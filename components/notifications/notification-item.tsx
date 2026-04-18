@@ -2,7 +2,6 @@
 
 import { Notification } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Trash2, Check, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";

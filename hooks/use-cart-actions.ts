@@ -14,7 +14,7 @@ import {
   removeFromCartAction,
 } from "@/app/actions/cart";
 import { FloatingCartItem } from "@/components/cart/floating-cart-item";
-import { ERROR_MESSAGES } from "@/lib/constants";
+// Hapus import ERROR_MESSAGES jika tidak digunakan lagi di file ini
 import type { ActionResponse } from "@/lib/server-action-response";
 
 /**
@@ -38,14 +38,16 @@ export function useCartActions() {
         quantity
       )) as ActionResponse;
 
-      if (result.error) {
+      // PERBAIKAN: Gunakan !result.success agar TypeScript mengenali properti error
+      if (!result.success) {
         handleError(result.error, result.code);
       } else {
         setShowFloatingItem(true);
         setTimeout(() => setShowFloatingItem(false), 1200);
 
-        toast.success(ERROR_MESSAGES.CART_ITEM_ADDED, {
-          description: "Item added to your cart",
+        // PERBAIKAN: Gunakan string biasa daripada memanggil ERROR_MESSAGES untuk success
+        toast.success("Item added to cart", {
+          description: "Item has been added to your cart",
         });
         router.refresh();
       }
@@ -64,7 +66,8 @@ export function useCartActions() {
         quantity
       )) as ActionResponse;
 
-      if (result.error) {
+      // PERBAIKAN: Gunakan !result.success
+      if (!result.success) {
         handleError(result.error, result.code);
       } else {
         router.refresh();
@@ -83,10 +86,12 @@ export function useCartActions() {
         cartItemId
       )) as ActionResponse;
 
-      if (result.error) {
+      // PERBAIKAN: Gunakan !result.success
+      if (!result.success) {
         handleError(result.error, result.code);
       } else {
-        toast.success(ERROR_MESSAGES.CART_ITEM_REMOVED);
+        // PERBAIKAN: Gunakan string biasa
+        toast.success("Item removed from cart");
         router.refresh();
       }
       setLoadingId(null);

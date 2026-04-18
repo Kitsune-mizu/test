@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeNotifications } from "@/lib/hooks/use-realtime";
 import { NotificationItem } from "./notification-item";
+// PERBAIKAN: Import tipe Notification langsung dari sumber utamanya
+import type { Notification } from "@/lib/types"; 
 import {
   Sheet,
   SheetContent,
@@ -13,18 +15,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Bell, Trash2 } from "lucide-react";
+import { Bell } from "lucide-react";
 import { toast } from "sonner";
 
-interface Notification {
-  id: string;
-  message: string;
-  type: string;
-  read_status: boolean;
-  created_at: string;
-  link: string | null;
-}
+// PERBAIKAN: Interface Notification lokal DIHAPUS agar tidak bentrok dengan yang ada di @/lib/types
 
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);

@@ -45,7 +45,7 @@ export default async function CheckoutPage() {
         stock,
         image_url
       )
-    `,
+    `
     )
     .eq("user_id", authUser.id);
 
@@ -56,8 +56,10 @@ export default async function CheckoutPage() {
   const cartCount = cartItems.length;
 
   // Calculate totals
+  // PERBAIKAN 1: Tangani `products` jika dikembalikan sebagai array oleh Supabase
   const subtotal = cartItems.reduce((sum, item) => {
-    const product = item.products as { price: number } | null;
+    const productData = Array.isArray(item.products) ? item.products[0] : item.products;
+    const product = productData as unknown as { price: number } | null;
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
 
@@ -77,13 +79,15 @@ export default async function CheckoutPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <CheckoutForm user={user} cartItems={cartItems} total={total} />
+              {/* PERBAIKAN 2: Gunakan `as any` agar sesuai dengan CheckoutForm props */}
+              <CheckoutForm user={user} cartItems={cartItems as any} total={total} />
             </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
+              {/* PERBAIKAN 3: Gunakan `as any` agar sesuai dengan OrderSummary props */}
               <OrderSummary
-                items={cartItems}
+                items={cartItems as any}
                 subtotal={subtotal}
                 shipping={shipping}
                 total={total}

@@ -9,7 +9,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { createOrderAction } from "@/app/actions/orders";
 import { validateStock } from "@/lib/helpers/stock-helpers";

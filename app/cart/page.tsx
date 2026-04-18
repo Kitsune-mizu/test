@@ -32,6 +32,7 @@ export default async function CartPage() {
     .single();
 
   // Get cart items with product details
+  // PERBAIKAN: Tambahkan user_id dan created_at ke dalam select
   const { data: cartItems } = await supabase
     .from("cart")
     .select(
@@ -39,6 +40,8 @@ export default async function CartPage() {
       id,
       quantity,
       product_id,
+      user_id,
+      created_at,
       products (
         id,
         name,
@@ -47,7 +50,7 @@ export default async function CartPage() {
         stock,
         image_url
       )
-    `,
+    `
     )
     .eq("user_id", authUser.id)
     .order("created_at", { ascending: false });
@@ -57,7 +60,11 @@ export default async function CartPage() {
   // Calculate totals
   const subtotal =
     cartItems?.reduce((sum, item) => {
-      const product = item.products as { price: number } | null;
+      // PERBAIKAN: Ambil produk dari array (jika Supabase mengembalikannya sebagai array)
+      // dan gunakan unknown assertion untuk menghindari error Type Mismatch
+      const productData = Array.isArray(item.products) ? item.products[0] : item.products;
+      const product = productData as unknown as { price: number } | null;
+      
       return sum + (product?.price || 0) * item.quantity;
     }, 0) || 0;
 
@@ -77,7 +84,8 @@ export default async function CartPage() {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2">
-                <CartItems items={cartItems} />
+                {/* PERBAIKAN: Gunakan tipe assertion yang sesuai agar sesuai dengan CartItems props */}
+                <CartItems items={cartItems as any} />
               </div>
 
               {/* Cart Summary */}

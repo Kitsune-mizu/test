@@ -6,12 +6,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import type { NotificationType } from "@/lib/constants";
 
 /**
- * Notification item type
+ * Toast item type
  */
-export interface NotificationItem {
+export interface Toast {
   id: string;
   message: string;
   type: "success" | "error" | "warning" | "info";
@@ -22,8 +21,8 @@ export interface NotificationItem {
  * Notification context value type
  */
 export interface NotificationContextType {
-  notifications: NotificationItem[];
-  addNotification: (notification: Omit<NotificationItem, "id">) => void;
+  notifications: Toast[];
+  addNotification: (notification: Omit<Toast, "id">) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
 }
@@ -45,14 +44,14 @@ interface NotificationProviderProps {
  * Manages toast/notification state for the application
  */
 export function NotificationProvider({ children }: NotificationProviderProps) {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState<Toast[]>([]);
 
   /**
    * Add new notification
    */
-  const addNotification = useCallback((notification: Omit<NotificationItem, "id">) => {
+  const addNotification = useCallback((notification: Omit<Toast, "id">) => {
     const id = `${Date.now()}-${Math.random()}`;
-    const item: NotificationItem = {
+    const item: Toast = {
       ...notification,
       id,
     };

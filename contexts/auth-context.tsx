@@ -84,8 +84,14 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
 
     // Listen for profile updates from other components
     const handleProfileUpdated = (e: Event) => {
+      // PERBAIKAN: Ubah tipe `role` dari `string` menjadi `User["role"]`
       const { name, role, phone, address } = (
-        e as CustomEvent<{ name?: string; role?: string; phone?: string; address?: string }>
+        e as CustomEvent<{
+          name?: string;
+          role?: User["role"]; 
+          phone?: string;
+          address?: string;
+        }>
       ).detail ?? {};
 
       setUser((prev) => {

@@ -227,7 +227,9 @@ export async function sendOrderConfirmationEmail(
 ): Promise<void> {
   try {
     const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`;
-    const template = generateOrderConfirmationEmail({
+    
+    // PERBAIKAN: Tambahkan await di sini
+    const template = await generateOrderConfirmationEmail({
       ...orderData,
       trackingUrl,
     });
@@ -254,7 +256,9 @@ export async function sendOrderStatusEmail(
 ): Promise<void> {
   try {
     const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${orderData.orderId}`;
-    const template = generateOrderStatusEmail({
+    
+    // PERBAIKAN: Tambahkan await di sini
+    const template = await generateOrderStatusEmail({
       ...orderData,
       trackingUrl,
     });

@@ -2,18 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import {
   LineChart,
   Line,
   BarChart,
@@ -21,9 +9,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip as RechartsTooltip,
-  Legend as RechartsLegend,
-  ResponsiveContainer as RechartsResponsiveContainer,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -165,7 +153,7 @@ export function AnalyticsDashboard() {
             {isLoading ? (
               <Skeleton className="h-64 w-full" />
             ) : (
-              <RechartsResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={analytics?.ordersChartData || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -176,8 +164,8 @@ export function AnalyticsDashboard() {
                     )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
-                  <RechartsTooltip />
-                  <RechartsLegend />
+                  <Tooltip />
+                  <Legend />
                   <Line
                     type="monotone"
                     dataKey="orders"
@@ -186,7 +174,7 @@ export function AnalyticsDashboard() {
                     dot={false}
                   />
                 </LineChart>
-              </RechartsResponsiveContainer>
+              </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
@@ -203,7 +191,7 @@ export function AnalyticsDashboard() {
             {isLoading ? (
               <Skeleton className="h-64 w-full" />
             ) : (
-              <RechartsResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={analytics?.revenueChartData || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -214,13 +202,13 @@ export function AnalyticsDashboard() {
                     )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
-                  <RechartsTooltip
+                  <Tooltip
                     formatter={(value: number) => formatPrice(value)}
                   />
-                  <RechartsLegend />
+                  <Legend />
                   <Bar dataKey="revenue" fill="#10b981" />
                 </BarChart>
-              </RechartsResponsiveContainer>
+              </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
@@ -238,7 +226,7 @@ export function AnalyticsDashboard() {
                 ))}
               </div>
             ) : (
-              <RechartsResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart
                   data={analytics?.topProductsData || []}
                   layout="vertical"
@@ -251,10 +239,10 @@ export function AnalyticsDashboard() {
                     width={120}
                     tick={{ fontSize: 11 }}
                   />
-                  <RechartsTooltip />
+                  <Tooltip />
                   <Bar dataKey="sales" fill="#f59e0b" />
                 </BarChart>
-              </RechartsResponsiveContainer>
+              </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
@@ -271,7 +259,7 @@ export function AnalyticsDashboard() {
             {isLoading ? (
               <Skeleton className="h-64 w-full" />
             ) : (
-              <RechartsResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={analytics?.customersChartData || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -282,8 +270,8 @@ export function AnalyticsDashboard() {
                     )}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
-                  <RechartsTooltip />
-                  <RechartsLegend />
+                  <Tooltip />
+                  <Legend />
                   <Line
                     type="monotone"
                     dataKey="customers"
@@ -292,7 +280,7 @@ export function AnalyticsDashboard() {
                     dot={false}
                   />
                 </LineChart>
-              </RechartsResponsiveContainer>
+              </ResponsiveContainer>
             )}
           </CardContent>
         </Card>

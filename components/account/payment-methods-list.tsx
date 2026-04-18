@@ -211,7 +211,7 @@ export function PaymentMethodsList({
                         expiry_date: e.target.value,
                       }))
                     }
-                    maxLength="5"
+                    maxLength={5} // PERBAIKAN: Diubah dari "5" menjadi {5}
                     required
                   />
                 </div>

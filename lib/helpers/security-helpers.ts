@@ -96,7 +96,8 @@ export async function sanitizeInput(input: string): Promise<string> {
 export async function validateCSRFToken(token: string): Promise<boolean> {
   // This should be implemented with your session management
   // For now, basic validation
-  return token && token.length > 20;
+  // PERBAIKAN: Gunakan `!!` untuk memastikan hasil kembaliannya murni boolean
+  return !!token && token.length > 20;
 }
 
 /**
@@ -128,8 +129,8 @@ export async function logSecurityEvent(
     // Sanitize details for logging
     const sanitizedDetails = {
       ...details,
-      email: details.email ? hashForLogging(details.email) : undefined,
-      phone: details.phone ? hashForLogging(details.phone) : undefined,
+      email: details.email ? await hashForLogging(details.email) : undefined,
+      phone: details.phone ? await hashForLogging(details.phone) : undefined,
     };
 
     // Log to audit table jika ada
