@@ -17,6 +17,7 @@ export interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  isSessionValid: boolean;
 }
 
 /**
@@ -40,69 +41,102 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
   const [user, setUser] = useState<User | null>(initialUser ?? null);
   const [loading, setLoading] = useState(!initialUser);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [isSessionValid, setIsSessionValid] = useState(true);
 
   useEffect(() => {
     // Only run on client
     if (typeof window === "undefined") return;
 
     const supabase = createClient();
+    let isMounted = true; // Prevent state updates after unmount
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const userData: User = {
-          id: session.user.id,
-          email: session.user.email ?? null,
-          name: session.user.user_metadata?.name ?? null,
-          role: session.user.user_metadata?.role ?? USER_ROLES.CUSTOMER,
-          phone: session.user.user_metadata?.phone ?? null,
-          address: session.user.user_metadata?.address ?? null,
-          created_at: session.user.created_at ?? new Date().toISOString(),
-        };
-        setUser(userData);
-        // Store in sessionStorage as backup
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("authUser", JSON.stringify(userData));
+    const initializeSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
+        if (session?.user) {
+          const userData: User = {
+            id: session.user.id,
+            email: session.user.email ?? null,
+            name: session.user.user_metadata?.name ?? null,
+            role: session.user.user_metadata?.role ?? USER_ROLES.CUSTOMER,
+            phone: session.user.user_metadata?.phone ?? null,
+            address: session.user.user_metadata?.address ?? null,
+            created_at: session.user.created_at ?? new Date().toISOString(),
+          };
+          setUser(userData);
+          setIsSessionValid(true);
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("authUser", JSON.stringify(userData));
+          }
+        } else {
+          setUser(null);
+          setIsSessionValid(true);
         }
+        setLoading(false);
+        setHasHydrated(true);
+      } catch (error) {
+        console.error("[v0] Session initialization error:", error);
+        setLoading(false);
+        setHasHydrated(true);
       }
-      setLoading(false);
-      setHasHydrated(true);
-    });
+    };
 
-    // Subscribe to auth state changes
+    initializeSession();
+
+    // Subscribe to auth state changes with event handling
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const userData: User = {
-          id: session.user.id,
-          email: session.user.email ?? null,
-          name: session.user.user_metadata?.name ?? null,
-          role: session.user.user_metadata?.role ?? USER_ROLES.CUSTOMER,
-          phone: session.user.user_metadata?.phone ?? null,
-          address: session.user.user_metadata?.address ?? null,
-          created_at: session.user.created_at ?? new Date().toISOString(),
-        };
-        setUser(userData);
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("authUser", JSON.stringify(userData));
-        }
-      } else {
-        setUser(null);
-        if (typeof window !== "undefined") {
-          sessionStorage.removeItem("authUser");
-        }
+      if (!isMounted) return;
+
+      console.log("[v0] Auth state changed:", event);
+
+      switch (event) {
+        case "SIGNED_IN":
+        case "USER_UPDATED":
+          if (session?.user) {
+            const userData: User = {
+              id: session.user.id,
+              email: session.user.email ?? null,
+              name: session.user.user_metadata?.name ?? null,
+              role: session.user.user_metadata?.role ?? USER_ROLES.CUSTOMER,
+              phone: session.user.user_metadata?.phone ?? null,
+              address: session.user.user_metadata?.address ?? null,
+              created_at: session.user.created_at ?? new Date().toISOString(),
+            };
+            setUser(userData);
+            setIsSessionValid(true);
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("authUser", JSON.stringify(userData));
+            }
+          }
+          break;
+
+        case "SIGNED_OUT":
+        case "TOKEN_REFRESHED":
+          if (!session?.user) {
+            setUser(null);
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem("authUser");
+            }
+          }
+          break;
+
+        default:
+          break;
       }
       setLoading(false);
     });
 
     // Listen for profile updates from other components
     const handleProfileUpdated = (e: Event) => {
-      // PERBAIKAN: Ubah tipe `role` dari `string` menjadi `User["role"]`
+      if (!isMounted) return;
       const { name, role, phone, address } = (
         e as CustomEvent<{
           name?: string;
-          role?: User["role"]; 
+          role?: User["role"];
           phone?: string;
           address?: string;
         }>
@@ -120,10 +154,13 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
       });
     };
 
-    // Listen for session sync events
-    const handleSessionSync = () => {
-      // Re-fetch the session to ensure we have the latest data
-      supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for session sync events with error handling
+    const handleSessionSync = async () => {
+      if (!isMounted) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
         if (session?.user) {
           const userData: User = {
             id: session.user.id,
@@ -135,17 +172,23 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
             created_at: session.user.created_at ?? new Date().toISOString(),
           };
           setUser(userData);
+          setIsSessionValid(true);
           if (typeof window !== "undefined") {
             sessionStorage.setItem("authUser", JSON.stringify(userData));
           }
+        } else {
+          setUser(null);
+          setIsSessionValid(false);
         }
-      });
+      } catch (error) {
+        console.error("[v0] Session sync error:", error);
+        setIsSessionValid(false);
+      }
     };
 
-    // Listen for visibility change to re-sync session
+    // Listen for visibility change to re-sync session when tab becomes active
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && hasHydrated) {
-        // Only sync if page is visible and initial hydration is done
+      if (document.visibilityState === "visible" && hasHydrated && isMounted) {
         handleSessionSync();
       }
     };
@@ -155,6 +198,7 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
       window.removeEventListener("profile:updated", handleProfileUpdated);
       window.removeEventListener("auth:sync-session", handleSessionSync);
@@ -166,6 +210,7 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
     user,
     loading,
     isAuthenticated: !!user,
+    isSessionValid,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

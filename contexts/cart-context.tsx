@@ -42,10 +42,13 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
   const [items, setItems] = useState<(CartItem & { product?: Product })[]>(initialItems);
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize mounted state
+  // Initialize mounted state and prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true);
+    setIsInitialized(true);
+    console.log("[v0] Cart context initialized with", initialItems.length, "items");
   }, []);
 
   /**
@@ -53,15 +56,19 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
    */
   const addItem = useCallback(
     (item: CartItem & { product?: Product }) => {
+      console.log("[v0] Cart: Adding item", item.product_id, "qty:", item.quantity);
       setItems((prevItems) => {
         const existingItem = prevItems.find((i) => i.product_id === item.product_id);
         if (existingItem) {
-          return prevItems.map((i) =>
+          const updatedItems = prevItems.map((i) =>
             i.product_id === item.product_id
               ? { ...i, quantity: i.quantity + item.quantity }
               : i
           );
+          console.log("[v0] Cart: Item quantity updated to", existingItem.quantity + item.quantity);
+          return updatedItems;
         }
+        console.log("[v0] Cart: New item added, total items:', prevItems.length + 1);
         return [...prevItems, item];
       });
     },
@@ -72,13 +79,19 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
    * Remove item from cart
    */
   const removeItem = useCallback((itemId: string) => {
-    setItems((prevItems) => prevItems.filter((i) => i.id !== itemId));
+    console.log("[v0] Cart: Removing item", itemId);
+    setItems((prevItems) => {
+      const filtered = prevItems.filter((i) => i.id !== itemId);
+      console.log("[v0] Cart: Item removed, total items:', filtered.length);
+      return filtered;
+    });
   }, []);
 
   /**
    * Update item quantity
    */
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
+    console.log("[v0] Cart: Updating quantity for', itemId, 'to', quantity);
     setItems((prevItems) =>
       quantity <= 0
         ? prevItems.filter((i) => i.id !== itemId)
@@ -90,6 +103,7 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
    * Clear all items from cart
    */
   const clearCart = useCallback(() => {
+    console.log("[v0] Cart: Clearing all items");
     setItems([]);
   }, []);
 
@@ -97,7 +111,8 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
    * Get total item count
    */
   const getItemCount = useCallback(() => {
-    return items.reduce((count, item) => count + item.quantity, 0);
+    const count = items.reduce((sum, item) => sum + item.quantity, 0);
+    return count;
   }, [items]);
 
   const value: CartContextType = {

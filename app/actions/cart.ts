@@ -23,23 +23,28 @@ export async function addToCartAction(
   productId: string,
   quantity: number = 1
 ): Promise<ActionResponse<{ message: string }>> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const authError = checkAuthenticated(user?.id);
-  if (authError && !authError.success) {
-    return errorResponse(authError.error, authError.code);
-  }
+    console.log("[v0] addToCartAction - User:", user?.id, "Product:", productId, "Qty:", quantity);
 
-  if (!productId || quantity < 1) {
-    return errorResponse(
-      "Invalid product or quantity",
-      ERROR_CODES.VALIDATION_ERROR
-    );
-  }
+    const authError = checkAuthenticated(user?.id);
+    if (authError && !authError.success) {
+      console.warn("[v0] Authentication failed for add to cart");
+      return authError;
+    }
+
+    if (!productId || quantity < 1) {
+      console.warn("[v0] Invalid product or quantity");
+      return errorResponse(
+        "Invalid product or quantity",
+        ERROR_CODES.VALIDATION_ERROR
+      );
+    }
 
   const { data: product, error: productError } = await supabase
     .from("products")
@@ -111,8 +116,16 @@ export async function addToCartAction(
     }
   }
 
-  revalidatePath("/", "layout");
-  return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_ADDED });
+    console.log("[v0] Item added to cart successfully");
+    revalidatePath("/", "layout");
+    return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_ADDED });
+  } catch (error) {
+    console.error("[v0] addToCartAction exception:", error);
+    return errorResponse(
+      ERROR_MESSAGES.NETWORK_ERROR,
+      ERROR_CODES.INTERNAL_ERROR
+    );
+  }
 }
 
 /**
@@ -122,23 +135,28 @@ export async function updateCartQuantityAction(
   cartItemId: string,
   quantity: number
 ): Promise<ActionResponse<{ message: string }>> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const authError = checkAuthenticated(user?.id);
-  if (authError && !authError.success) {
-    return errorResponse(authError.error, authError.code);
-  }
+    console.log("[v0] updateCartQuantityAction - User:", user?.id, "Item:", cartItemId, "Qty:", quantity);
 
-  if (!cartItemId || quantity < 0) {
-    return errorResponse(
-      "Invalid cart item or quantity",
-      ERROR_CODES.VALIDATION_ERROR
-    );
-  }
+    const authError = checkAuthenticated(user?.id);
+    if (authError && !authError.success) {
+      console.warn("[v0] Authentication failed for update quantity");
+      return authError;
+    }
+
+    if (!cartItemId || quantity < 0) {
+      console.warn("[v0] Invalid cart item or quantity");
+      return errorResponse(
+        "Invalid cart item or quantity",
+        ERROR_CODES.VALIDATION_ERROR
+      );
+    }
 
   if (quantity === 0) {
     return removeFromCartAction(cartItemId);
@@ -177,8 +195,16 @@ export async function updateCartQuantityAction(
     );
   }
 
-  revalidatePath("/", "layout");
-  return successResponse({ message: "Cart updated" });
+    console.log("[v0] Cart quantity updated successfully");
+    revalidatePath("/", "layout");
+    return successResponse({ message: "Cart updated" });
+  } catch (error) {
+    console.error("[v0] updateCartQuantityAction exception:", error);
+    return errorResponse(
+      ERROR_MESSAGES.NETWORK_ERROR,
+      ERROR_CODES.INTERNAL_ERROR
+    );
+  }
 }
 
 /**
@@ -187,23 +213,28 @@ export async function updateCartQuantityAction(
 export async function removeFromCartAction(
   cartItemId: string
 ): Promise<ActionResponse<{ message: string }>> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const authError = checkAuthenticated(user?.id);
-  if (authError && !authError.success) {
-    return errorResponse(authError.error, authError.code);
-  }
+    console.log("[v0] removeFromCartAction - User:", user?.id, "Item:", cartItemId);
 
-  if (!cartItemId) {
-    return errorResponse(
-      "Invalid cart item",
-      ERROR_CODES.VALIDATION_ERROR
-    );
-  }
+    const authError = checkAuthenticated(user?.id);
+    if (authError && !authError.success) {
+      console.warn("[v0] Authentication failed for remove from cart");
+      return authError;
+    }
+
+    if (!cartItemId) {
+      console.warn("[v0] Invalid cart item");
+      return errorResponse(
+        "Invalid cart item",
+        ERROR_CODES.VALIDATION_ERROR
+      );
+    }
 
   const { error: deleteError } = await supabase
     .from("cart")
@@ -218,37 +249,58 @@ export async function removeFromCartAction(
     );
   }
 
-  revalidatePath("/", "layout");
-  return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_REMOVED });
+    console.log("[v0] Item removed from cart successfully");
+    revalidatePath("/", "layout");
+    return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_REMOVED });
+  } catch (error) {
+    console.error("[v0] removeFromCartAction exception:", error);
+    return errorResponse(
+      ERROR_MESSAGES.NETWORK_ERROR,
+      ERROR_CODES.INTERNAL_ERROR
+    );
+  }
 }
 
 /**
  * Clear all items from cart
  */
 export async function clearCartAction(): Promise<ActionResponse<{ message: string }>> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const authError = checkAuthenticated(user?.id);
-  if (authError && !authError.success) {
-    return errorResponse(authError.error, authError.code);
-  }
+    console.log("[v0] clearCartAction - User:", user?.id);
 
-  const { error: deleteError } = await supabase
-    .from("cart")
-    .delete()
-    .eq("user_id", user!.id);
+    const authError = checkAuthenticated(user?.id);
+    if (authError && !authError.success) {
+      console.warn("[v0] Authentication failed for clear cart");
+      return authError;
+    }
 
-  if (deleteError) {
+    const { error: deleteError } = await supabase
+      .from("cart")
+      .delete()
+      .eq("user_id", user!.id);
+
+    if (deleteError) {
+      console.error("[v0] Clear cart error:", deleteError);
+      return errorResponse(
+        ERROR_MESSAGES.NETWORK_ERROR,
+        ERROR_CODES.DATABASE_ERROR
+      );
+    }
+
+    console.log("[v0] Cart cleared successfully");
+    revalidatePath("/", "layout");
+    return successResponse({ message: "Cart cleared" });
+  } catch (error) {
+    console.error("[v0] clearCartAction exception:", error);
     return errorResponse(
       ERROR_MESSAGES.NETWORK_ERROR,
-      ERROR_CODES.DATABASE_ERROR
+      ERROR_CODES.INTERNAL_ERROR
     );
   }
-
-  revalidatePath("/", "layout");
-  return successResponse({ message: "Cart cleared" });
 }
