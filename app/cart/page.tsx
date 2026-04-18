@@ -57,14 +57,16 @@ export default async function CartPage() {
 
   const cartCount = cartItems?.length || 0;
 
+  // Normalize cart items to ensure products are included
+  const normalizedCartItems = cartItems?.map((item: any) => ({
+    ...item,
+    product: Array.isArray(item.products) ? item.products[0] : item.products,
+  })) || [];
+
   // Calculate totals
   const subtotal =
-    cartItems?.reduce((sum, item) => {
-      // PERBAIKAN: Ambil produk dari array (jika Supabase mengembalikannya sebagai array)
-      // dan gunakan unknown assertion untuk menghindari error Type Mismatch
-      const productData = Array.isArray(item.products) ? item.products[0] : item.products;
-      const product = productData as unknown as { price: number } | null;
-      
+    normalizedCartItems.reduce((sum, item) => {
+      const product = item.product as unknown as { price: number } | null;
       return sum + (product?.price || 0) * item.quantity;
     }, 0) || 0;
 
@@ -84,8 +86,7 @@ export default async function CartPage() {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2">
-                {/* PERBAIKAN: Gunakan tipe assertion yang sesuai agar sesuai dengan CartItems props */}
-                <CartItems items={cartItems as any} />
+                <CartItems items={normalizedCartItems} />
               </div>
 
               {/* Cart Summary */}

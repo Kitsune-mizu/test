@@ -102,7 +102,7 @@ export function useCartActions() {
    * Handle action errors with appropriate user feedback
    */
   const handleError = (error: string, code?: string) => {
-    if (code === "UNAUTHENTICATED") {
+    if (error === "Not authenticated" || code === "UNAUTHENTICATED") {
       toast.error("Please sign in to manage your cart");
       router.push("/auth/login");
     } else {

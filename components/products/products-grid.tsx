@@ -12,7 +12,7 @@ interface ProductsGridProps {
 
 export function ProductsGrid({ products }: ProductsGridProps) {
   const { addToCart } = useCartActions();
-  const { toggleWishlist, wishlistIds } = useWishlistActions();
+  const { toggleWishlist, wishlistIds, isInitialized } = useWishlistActions();
 
   if (products.length === 0) {
     return (
@@ -35,8 +35,8 @@ export function ProductsGrid({ products }: ProductsGridProps) {
           key={product.id}
           product={product}
           onAddToCart={addToCart}
-          onToggleWishlist={toggleWishlist}
-          isInWishlist={wishlistIds.includes(product.id)}
+          onToggleWishlist={isInitialized ? toggleWishlist : undefined}
+          isInWishlist={isInitialized && wishlistIds.includes(product.id)}
         />
       ))}
     </div>

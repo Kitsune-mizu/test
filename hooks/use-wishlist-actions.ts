@@ -51,24 +51,20 @@ export function useWishlistActions() {
   const toggleWishlist = async (productId: string) => {
     setLoadingId(productId);
     startTransition(async () => {
-      // PERBAIKAN 2: Gunakan tipe kustom agar TS mengenali 'success', 'error', dan 'added' sekaligus
       const result = (await toggleWishlistAction(productId)) as {
-        success: boolean;
+        success?: boolean;
         error?: string;
-        code?: string;
         added?: boolean;
       };
 
-      // Cek menggunakan !result.success
-      if (!result.success) {
-        if (result.code === "UNAUTHENTICATED") {
+      if (result.error) {
+        if (result.error === "Not authenticated") {
           toast.error("Please sign in to use wishlist");
           router.push("/auth/login");
         } else {
           toast.error(result.error || "Failed to update wishlist");
         }
-      } else {
-        // Jika sukses, kita bisa mengecek status 'added'
+      } else if (result.success) {
         if (result.added) {
           setWishlistIds((prev) => [...prev, productId]);
           toast.success("Added to wishlist");

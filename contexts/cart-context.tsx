@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import type { CartItem, Product } from "@/lib/types";
 
 /**
@@ -41,6 +41,12 @@ interface CartProviderProps {
 export function CartProvider({ children, initialItems = [] }: CartProviderProps) {
   const [items, setItems] = useState<(CartItem & { product?: Product })[]>(initialItems);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Initialize mounted state
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   /**
    * Add item to cart or update quantity if already exists

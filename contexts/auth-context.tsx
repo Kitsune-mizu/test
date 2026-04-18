@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/lib/types";
 import { USER_ROLES } from "@/lib/constants";
@@ -39,6 +39,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children, initialUser = null }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser ?? null);
   const [loading, setLoading] = useState(!initialUser);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
     // Only run on client
@@ -49,7 +50,7 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        setUser({
+        const userData: User = {
           id: session.user.id,
           email: session.user.email ?? null,
           name: session.user.user_metadata?.name ?? null,
@@ -57,9 +58,15 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
           phone: session.user.user_metadata?.phone ?? null,
           address: session.user.user_metadata?.address ?? null,
           created_at: session.user.created_at ?? new Date().toISOString(),
-        });
+        };
+        setUser(userData);
+        // Store in sessionStorage as backup
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("authUser", JSON.stringify(userData));
+        }
       }
       setLoading(false);
+      setHasHydrated(true);
     });
 
     // Subscribe to auth state changes
@@ -67,7 +74,7 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        setUser({
+        const userData: User = {
           id: session.user.id,
           email: session.user.email ?? null,
           name: session.user.user_metadata?.name ?? null,
@@ -75,9 +82,16 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
           phone: session.user.user_metadata?.phone ?? null,
           address: session.user.user_metadata?.address ?? null,
           created_at: session.user.created_at ?? new Date().toISOString(),
-        });
+        };
+        setUser(userData);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("authUser", JSON.stringify(userData));
+        }
       } else {
         setUser(null);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("authUser");
+        }
       }
       setLoading(false);
     });
@@ -111,7 +125,7 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
       // Re-fetch the session to ensure we have the latest data
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
-          setUser({
+          const userData: User = {
             id: session.user.id,
             email: session.user.email ?? null,
             name: session.user.user_metadata?.name ?? null,
@@ -119,20 +133,34 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
             phone: session.user.user_metadata?.phone ?? null,
             address: session.user.user_metadata?.address ?? null,
             created_at: session.user.created_at ?? new Date().toISOString(),
-          });
+          };
+          setUser(userData);
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("authUser", JSON.stringify(userData));
+          }
         }
       });
     };
 
+    // Listen for visibility change to re-sync session
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && hasHydrated) {
+        // Only sync if page is visible and initial hydration is done
+        handleSessionSync();
+      }
+    };
+
     window.addEventListener("profile:updated", handleProfileUpdated);
     window.addEventListener("auth:sync-session", handleSessionSync);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       subscription.unsubscribe();
       window.removeEventListener("profile:updated", handleProfileUpdated);
       window.removeEventListener("auth:sync-session", handleSessionSync);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [hasHydrated]);
 
   const value: AuthContextType = {
     user,
