@@ -13,6 +13,8 @@ import { ChangePasswordForm } from "@/components/account/change-password-form";
 import { PaymentMethodsList } from "@/components/account/payment-methods-list";
 import type { SavedPaymentMethod } from "@/lib/types";
 import { useEffect } from "react";
+import { Bell } from "lucide-react";
+import { NotificationSettingsForm } from "@/components/notifications/notification-settings-form";
 
 export default function CustomerSettingsPage() {
   const [user, setUser] = useState<any>(null);
@@ -139,6 +141,19 @@ export default function CustomerSettingsPage() {
 
       {/* Change Password Form */}
       <ChangePasswordForm />
+
+      {/* Notification Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notification Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <NotificationSettingsForm />
+        </CardContent>
+      </Card>
 
       {/* Login History */}
       <Card>

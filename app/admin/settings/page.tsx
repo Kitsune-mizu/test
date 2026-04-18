@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Bell } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChangePasswordForm } from "@/components/account/change-password-form";
+import { NotificationSettingsForm } from "@/components/notifications/notification-settings-form";
 
 export default async function AdminSettingsPage() {
   const supabase = await createClient();
@@ -64,6 +65,19 @@ export default async function AdminSettingsPage() {
 
       {/* Change Password Form */}
       <ChangePasswordForm />
+
+      {/* Notification Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notification Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <NotificationSettingsForm />
+        </CardContent>
+      </Card>
 
       {/* Activity Log */}
       <Card>
