@@ -302,6 +302,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```bash
 pnpm install
 pnpm dev
+
+pnpm build
+pnpm start
 ```
 
 Open http://localhost:3000
