@@ -14,7 +14,8 @@ export const ORDER_STATUSES = {
   CANCELLED: "cancelled",
 } as const;
 
-export type OrderStatus = typeof ORDER_STATUSES[keyof typeof ORDER_STATUSES];
+export type OrderStatus =
+  typeof ORDER_STATUSES[keyof typeof ORDER_STATUSES];
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Pending",
@@ -42,15 +43,17 @@ export const USER_ROLES = {
   ADMIN: "admin",
 } as const;
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+export type UserRole =
+  typeof USER_ROLES[keyof typeof USER_ROLES];
 
 // Payment Methods
 export const PAYMENT_METHODS = {
   CARD: "card",
-  COD: "cod", // Cash on Delivery
+  COD: "cod",
 } as const;
 
-export type PaymentMethod = typeof PAYMENT_METHODS[keyof typeof PAYMENT_METHODS];
+export type PaymentMethod =
+  typeof PAYMENT_METHODS[keyof typeof PAYMENT_METHODS];
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   card: "Credit/Debit Card",
@@ -63,7 +66,8 @@ export const PAYMENT_METHOD_TYPES = {
   BANK_ACCOUNT: "bank_account",
 } as const;
 
-export type SavedPaymentMethodType = typeof PAYMENT_METHOD_TYPES[keyof typeof PAYMENT_METHOD_TYPES];
+export type SavedPaymentMethodType =
+  typeof PAYMENT_METHOD_TYPES[keyof typeof PAYMENT_METHOD_TYPES];
 
 // Shipping Methods
 export const SHIPPING_METHODS = {
@@ -72,7 +76,8 @@ export const SHIPPING_METHODS = {
   OVERNIGHT: "overnight",
 } as const;
 
-export type ShippingMethod = typeof SHIPPING_METHODS[keyof typeof SHIPPING_METHODS];
+export type ShippingMethod =
+  typeof SHIPPING_METHODS[keyof typeof SHIPPING_METHODS];
 
 export const SHIPPING_METHOD_LABELS: Record<ShippingMethod, string> = {
   standard: "Standard (5-7 days)",
@@ -96,7 +101,8 @@ export const NOTIFICATION_TYPES = {
   SYSTEM_MESSAGE: "system_message",
 } as const;
 
-export type NotificationType = typeof NOTIFICATION_TYPES[keyof typeof NOTIFICATION_TYPES];
+export type NotificationType =
+  typeof NOTIFICATION_TYPES[keyof typeof NOTIFICATION_TYPES];
 
 // Product Categories
 export const PRODUCT_CATEGORIES = {
@@ -107,7 +113,7 @@ export const PRODUCT_CATEGORIES = {
   OUTDOOR_EQUIPMENT: "Outdoor Equipment",
 } as const;
 
-// Error Messages
+// ❌ ERROR (khusus error saja)
 export const ERROR_MESSAGES = {
   UNAUTHORIZED: "You are not authorized to perform this action",
   PRODUCT_NOT_FOUND: "Product not found",
@@ -122,7 +128,7 @@ export const ERROR_MESSAGES = {
   NETWORK_ERROR: "Network error. Please try again",
 } as const;
 
-// Success Messages
+// ✅ SUCCESS (🔥 pakai ini di cart.ts)
 export const SUCCESS_MESSAGES = {
   PROFILE_UPDATED: "Profile updated successfully",
   CART_ITEM_ADDED: "Item added to cart",
@@ -135,9 +141,9 @@ export const SUCCESS_MESSAGES = {
 
 // API Configuration
 export const API_CONFIG = {
-  TIMEOUT: 30000, // 30 seconds
+  TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
-  RETRY_DELAY: 1000, // 1 second
+  RETRY_DELAY: 1000,
 } as const;
 
 // Pagination
@@ -149,7 +155,7 @@ export const PAGINATION = {
 
 // Tax Configuration
 export const TAX_CONFIG = {
-  DEFAULT_TAX_RATE: 10, // percentage
+  DEFAULT_TAX_RATE: 10,
   MAX_TAX_RATE: 50,
 } as const;
 
@@ -174,7 +180,7 @@ export const DEFAULTS = {
   MAX_CART_ITEMS: 100,
 } as const;
 
-// Timeouts (in milliseconds)
+// Timeouts
 export const TIMEOUTS = {
   TOAST_DURATION: 3000,
   DIALOG_CLOSE_DELAY: 200,

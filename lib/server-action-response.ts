@@ -6,19 +6,23 @@
 import { ERROR_MESSAGES } from "@/lib/constants";
 
 /**
- * Standard action response type
+ * Standard action response type (union biar lebih aman)
  */
-export interface ActionResponse<T = undefined> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  code?: string;
-}
+export type ActionResponse<T = undefined> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: string;
+      code?: string;
+    };
 
 /**
  * Success response builder
  */
-export function successResponse<T>(data?: T): ActionResponse<T> {
+export function successResponse<T>(data: T): ActionResponse<T> {
   return {
     success: true,
     data,
@@ -26,12 +30,12 @@ export function successResponse<T>(data?: T): ActionResponse<T> {
 }
 
 /**
- * Error response builder
+ * Error response builder (🔥 FIX: jadi generic)
  */
-export function errorResponse(
+export function errorResponse<T = undefined>(
   message: string,
   code: string = "UNKNOWN_ERROR"
-): ActionResponse {
+): ActionResponse<T> {
   return {
     success: false,
     error: message,
@@ -57,14 +61,16 @@ export const ERROR_CODES = {
 /**
  * Handle authentication check
  */
-export function checkAuthenticated(userId: string | undefined) {
+export function checkAuthenticated(
+  userId: string | undefined
+): ActionResponse | null {
   if (!userId) {
     return errorResponse(
       ERROR_MESSAGES.UNAUTHORIZED,
       ERROR_CODES.UNAUTHORIZED
     );
   }
-  return null; // No error
+  return null;
 }
 
 /**
@@ -86,9 +92,11 @@ export function validateInput(
 /**
  * Handle Supabase errors
  */
-export function handleSupabaseError(error: unknown): ActionResponse {
+export function handleSupabaseError<T = undefined>(
+  error: unknown
+): ActionResponse<T> {
   if (!error) {
-    return errorResponse(
+    return errorResponse<T>(
       ERROR_MESSAGES.NETWORK_ERROR,
       ERROR_CODES.DATABASE_ERROR
     );
@@ -98,14 +106,15 @@ export function handleSupabaseError(error: unknown): ActionResponse {
 
   if (err.code === "23505") {
     // Unique constraint violation
-    return errorResponse(
+    return errorResponse<T>(
       ERROR_MESSAGES.EMAIL_ALREADY_EXISTS,
       ERROR_CODES.CONFLICT
     );
   }
 
   const message = (err.message as string) || ERROR_MESSAGES.NETWORK_ERROR;
-  return errorResponse(message, ERROR_CODES.DATABASE_ERROR);
+
+  return errorResponse<T>(message, ERROR_CODES.DATABASE_ERROR);
 }
 
 /**
@@ -118,7 +127,7 @@ export async function executeAction<T>(
     return await action();
   } catch (error) {
     console.error("[Action Error]", error);
-    return errorResponse(
+    return errorResponse<T>(
       ERROR_MESSAGES.NETWORK_ERROR,
       ERROR_CODES.INTERNAL_ERROR
     );

@@ -174,7 +174,6 @@ function LoginForm() {
                   Password
                 </Label>
                 <div className="flex gap-2">
-                  <span className="text-neutral-300">|</span>
                   <Link
                     href="/auth/change-password"
                     className="text-xs text-neutral-500 hover:text-[#E10600] transition-colors"

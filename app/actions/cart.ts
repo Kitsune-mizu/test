@@ -7,14 +7,13 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { CartItem } from "@/lib/types";
 import {
   successResponse,
   errorResponse,
   ERROR_CODES,
   checkAuthenticated,
 } from "@/lib/server-action-response";
-import { ERROR_MESSAGES } from "@/lib/constants";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "@/lib/constants";
 import type { ActionResponse } from "@/lib/server-action-response";
 
 /**
@@ -23,7 +22,7 @@ import type { ActionResponse } from "@/lib/server-action-response";
 export async function addToCartAction(
   productId: string,
   quantity: number = 1
-): Promise<ActionResponse> {
+): Promise<ActionResponse<{ message: string }>> {
   const supabase = await createClient();
 
   const {
@@ -31,7 +30,9 @@ export async function addToCartAction(
   } = await supabase.auth.getUser();
 
   const authError = checkAuthenticated(user?.id);
-  if (authError) return authError;
+  if (authError && !authError.success) {
+    return errorResponse(authError.error, authError.code);
+  }
 
   if (!productId || quantity < 1) {
     return errorResponse(
@@ -40,7 +41,6 @@ export async function addToCartAction(
     );
   }
 
-  // Check if product exists and has stock
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("id, stock")
@@ -61,7 +61,6 @@ export async function addToCartAction(
     );
   }
 
-  // Check if item already in cart
   const { data: existingItem, error: selectError } = await supabase
     .from("cart")
     .select("id, quantity")
@@ -70,7 +69,6 @@ export async function addToCartAction(
     .single();
 
   if (selectError && selectError.code !== "PGRST116") {
-    // PGRST116 means no rows found, which is expected
     return errorResponse(
       ERROR_MESSAGES.NETWORK_ERROR,
       ERROR_CODES.DATABASE_ERROR
@@ -78,8 +76,8 @@ export async function addToCartAction(
   }
 
   if (existingItem) {
-    // Update quantity
     const newQuantity = existingItem.quantity + quantity;
+
     if (newQuantity > product.stock) {
       return errorResponse(
         ERROR_MESSAGES.INSUFFICIENT_STOCK,
@@ -99,7 +97,6 @@ export async function addToCartAction(
       );
     }
   } else {
-    // Insert new item
     const { error: insertError } = await supabase.from("cart").insert({
       user_id: user!.id,
       product_id: productId,
@@ -115,7 +112,7 @@ export async function addToCartAction(
   }
 
   revalidatePath("/", "layout");
-  return successResponse({ message: ERROR_MESSAGES.CART_ITEM_ADDED });
+  return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_ADDED });
 }
 
 /**
@@ -124,7 +121,7 @@ export async function addToCartAction(
 export async function updateCartQuantityAction(
   cartItemId: string,
   quantity: number
-): Promise<ActionResponse> {
+): Promise<ActionResponse<{ message: string }>> {
   const supabase = await createClient();
 
   const {
@@ -132,7 +129,9 @@ export async function updateCartQuantityAction(
   } = await supabase.auth.getUser();
 
   const authError = checkAuthenticated(user?.id);
-  if (authError) return authError;
+  if (authError && !authError.success) {
+    return errorResponse(authError.error, authError.code);
+  }
 
   if (!cartItemId || quantity < 0) {
     return errorResponse(
@@ -145,7 +144,6 @@ export async function updateCartQuantityAction(
     return removeFromCartAction(cartItemId);
   }
 
-  // Get cart item with product info
   const { data: cartItem, error: selectError } = await supabase
     .from("cart")
     .select("id, product_id, products(stock)")
@@ -154,13 +152,11 @@ export async function updateCartQuantityAction(
     .single();
 
   if (selectError || !cartItem) {
-    return errorResponse(
-      "Cart item not found",
-      ERROR_CODES.NOT_FOUND
-    );
+    return errorResponse("Cart item not found", ERROR_CODES.NOT_FOUND);
   }
 
-  const product = cartItem.products as { stock: number } | null;
+  const product = cartItem.products?.[0];
+
   if (!product || quantity > product.stock) {
     return errorResponse(
       ERROR_MESSAGES.INSUFFICIENT_STOCK,
@@ -182,7 +178,7 @@ export async function updateCartQuantityAction(
   }
 
   revalidatePath("/", "layout");
-  return successResponse();
+  return successResponse({ message: "Cart updated" });
 }
 
 /**
@@ -190,7 +186,7 @@ export async function updateCartQuantityAction(
  */
 export async function removeFromCartAction(
   cartItemId: string
-): Promise<ActionResponse> {
+): Promise<ActionResponse<{ message: string }>> {
   const supabase = await createClient();
 
   const {
@@ -198,7 +194,9 @@ export async function removeFromCartAction(
   } = await supabase.auth.getUser();
 
   const authError = checkAuthenticated(user?.id);
-  if (authError) return authError;
+  if (authError && !authError.success) {
+    return errorResponse(authError.error, authError.code);
+  }
 
   if (!cartItemId) {
     return errorResponse(
@@ -221,13 +219,13 @@ export async function removeFromCartAction(
   }
 
   revalidatePath("/", "layout");
-  return successResponse({ message: ERROR_MESSAGES.CART_ITEM_REMOVED });
+  return successResponse({ message: SUCCESS_MESSAGES.CART_ITEM_REMOVED });
 }
 
 /**
  * Clear all items from cart
  */
-export async function clearCartAction(): Promise<ActionResponse> {
+export async function clearCartAction(): Promise<ActionResponse<{ message: string }>> {
   const supabase = await createClient();
 
   const {
@@ -235,7 +233,9 @@ export async function clearCartAction(): Promise<ActionResponse> {
   } = await supabase.auth.getUser();
 
   const authError = checkAuthenticated(user?.id);
-  if (authError) return authError;
+  if (authError && !authError.success) {
+    return errorResponse(authError.error, authError.code);
+  }
 
   const { error: deleteError } = await supabase
     .from("cart")
@@ -250,5 +250,5 @@ export async function clearCartAction(): Promise<ActionResponse> {
   }
 
   revalidatePath("/", "layout");
-  return successResponse();
+  return successResponse({ message: "Cart cleared" });
 }

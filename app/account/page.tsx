@@ -27,7 +27,7 @@ export default async function AccountPage() {
   const user = {
     ...profile,
     email: authUser.email,
-    last_sign_in_at: authUser.last_sign_in_at, // ✅ Tambahkan ini
+    last_sign_in_at: authUser.last_sign_in_at, 
   };
 
   return (
