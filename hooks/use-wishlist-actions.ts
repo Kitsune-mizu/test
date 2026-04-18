@@ -149,7 +149,7 @@ export function useWishlistActions() {
     wishlistIds,
     isLoading: isPending,
     loadingId,
-    isInitialized: isInitialized && !isLoading,
+    isInitialized: isInitialized && !isPending,
     retryCount,
     isInWishlist: useCallback(
       (productId: string) => wishlistIds.includes(productId),
