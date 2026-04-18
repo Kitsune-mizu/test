@@ -68,7 +68,7 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
           console.log("[v0] Cart: Item quantity updated to", existingItem.quantity + item.quantity);
           return updatedItems;
         }
-        console.log("[v0] Cart: New item added, total items:', prevItems.length + 1);
+        console.log("[v0] Cart: New item added, total items:", prevItems.length + 1);
         return [...prevItems, item];
       });
     },
@@ -82,7 +82,7 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
     console.log("[v0] Cart: Removing item", itemId);
     setItems((prevItems) => {
       const filtered = prevItems.filter((i) => i.id !== itemId);
-      console.log("[v0] Cart: Item removed, total items:', filtered.length);
+      console.log("[v0] Cart: Item removed, total items:", filtered.length);
       return filtered;
     });
   }, []);
@@ -91,7 +91,7 @@ export function CartProvider({ children, initialItems = [] }: CartProviderProps)
    * Update item quantity
    */
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
-    console.log("[v0] Cart: Updating quantity for', itemId, 'to', quantity);
+    console.log("[v0] Cart: Updating quantity for", itemId, "to", quantity);
     setItems((prevItems) =>
       quantity <= 0
         ? prevItems.filter((i) => i.id !== itemId)
