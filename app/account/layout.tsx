@@ -34,7 +34,7 @@ export default async function AccountLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header user={user} cartCount={cartCount || 0} />
+      <Header cartCount={cartCount || 0} />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-8">

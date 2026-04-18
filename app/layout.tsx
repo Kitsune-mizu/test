@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/sonner";
+import { RootProvider } from "@/components/providers/root-provider";
 import "./globals.css";
 
 /* ===== Fonts ===== */
@@ -44,9 +45,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
-        {children}
-        <Toaster position="top-right" />
-        <Analytics />
+        <RootProvider>
+          {children}
+          <Toaster position="top-right" />
+          <Analytics />
+        </RootProvider>
       </body>
     </html>
   );

@@ -66,7 +66,7 @@ export default async function CartPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header user={user} cartCount={cartCount} />
+      <Header cartCount={cartCount} />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <h1 className="font-heading text-3xl font-bold mb-8">

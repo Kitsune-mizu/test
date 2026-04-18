@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   ShoppingCart,
@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HikaruLogoMinimal } from "@/components/ui/hikaru-logo";
-import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/auth-context";
+import { useSessionSync } from "@/hooks/use-session-sync";
 import { NotificationCenter } from "@/components/notifications/notification-center";
 // SheetTitle & SheetDescription must be static (Radix a11y requirement)
 import { SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -65,15 +66,7 @@ const SheetTrigger = dynamic(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface UserData {
-  id: string;
-  name: string | null;
-  role: string;
-}
-
 interface HeaderProps {
-  // Passed from server component — same pattern as AccountSidebar
-  user?: UserData | null;
   cartCount?: number;
 }
 
@@ -105,70 +98,17 @@ const categories = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function Header({ user, cartCount = 0 }: HeaderProps) {
+export function Header({ cartCount = 0 }: HeaderProps) {
+  const { user: currentUser, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
-  // Initialise from server-passed prop — same as sidebar does
-  const [currentUser, setCurrentUser] = useState<UserData | null>(user ?? null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
-  // Keep prop changes (e.g. after router.refresh()) in sync with local state
-  useEffect(() => {
-    setCurrentUser(user ?? null);
-  }, [user]);
+  // Use the session sync hook to keep auth state in sync with profile updates
+  useSessionSync();
 
   useEffect(() => {
     setMounted(true);
-
-    // ProfileForm dispatches "profile:updated" with the new name in detail
-    // so we can update state immediately — before router.refresh() rerenders
-    const handleProfileUpdated = (e: Event) => {
-      const { name, role } =
-        (e as CustomEvent<{ name: string; role: string }>).detail ?? {};
-      setCurrentUser((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          name: name ?? prev.name,
-          role: role ?? prev.role,
-        };
-      });
-    };
-
-    window.addEventListener("profile:updated", handleProfileUpdated);
-    return () =>
-      window.removeEventListener("profile:updated", handleProfileUpdated);
-  }, []);
-
-  // ─── Supabase auth listener ─────────────────────────────────────────────────
-  useEffect(() => {
-    // Only run on client
-    if (typeof window === "undefined") return;
-
-    const supabase = createClient();
-
-    // Subscribe to auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Handle sign in / session refresh
-      if (session?.user) {
-        setCurrentUser({
-          id: session.user.id,
-          name: session.user.user_metadata?.name ?? null,
-          role: session.user.user_metadata?.role ?? "customer",
-        });
-      }
-      // Handle sign out
-      else if (event === "SIGNED_OUT") {
-        setCurrentUser(null);
-      }
-    });
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
   // ─── Derived display values ─────────────────────────────────────────────────

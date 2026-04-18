@@ -1,3 +1,8 @@
+/**
+ * Product Card Component
+ * Displays a single product with image, price, and quick actions
+ */
+
 "use client";
 
 import Image from "next/image";
@@ -6,16 +11,28 @@ import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/lib/types";
-import { formatPrice } from "@/lib/format";
+import { formatCurrency, isOutOfStock } from "@/lib/utils";
 
+/**
+ * Product card props
+ */
 interface ProductCardProps {
+  /** Product data to display */
   product: Product;
+  /** Callback when add to cart is clicked */
   onAddToCart?: (productId: string) => void;
+  /** Callback when wishlist toggle is clicked */
   onToggleWishlist?: (productId: string) => void;
+  /** Whether product is in user's wishlist */
   isInWishlist?: boolean;
+  /** Whether to show action buttons */
   showActions?: boolean;
 }
 
+/**
+ * Product Card Component
+ * Displays product information with hover actions
+ */
 export function ProductCard({
   product,
   onAddToCart,
@@ -23,7 +40,7 @@ export function ProductCard({
   isInWishlist = false,
   showActions = true,
 }: ProductCardProps) {
-  const isOutOfStock = product.stock === 0;
+  const outOfStock = isOutOfStock(product);
 
   return (
     <div className="group relative bg-white">
@@ -47,13 +64,13 @@ export function ProductCard({
 
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          {isOutOfStock && (
+          {outOfStock && (
             <Badge className="bg-black text-white text-[10px] font-medium px-2 py-0.5">
               SOLD OUT
             </Badge>
           )}
           {product.stock > 0 && product.stock <= 5 && (
-            <Badge className="bg-[#E10600] text-white text-[10px] font-medium px-2 py-0.5">
+            <Badge className="bg-red-600 text-white text-[10px] font-medium px-2 py-0.5">
               LOW STOCK
             </Badge>
           )}
@@ -66,7 +83,7 @@ export function ProductCard({
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={isOutOfStock}
+                disabled={outOfStock}
                 onClick={(e) => {
                   e.preventDefault();
                   onAddToCart(product.id);
@@ -98,7 +115,7 @@ export function ProductCard({
                 }}
               >
                 <Heart
-                  className={`h-4 w-4 ${isInWishlist ? "fill-[#E10600] text-[#E10600]" : ""}`}
+                  className={`h-4 w-4 ${isInWishlist ? "fill-red-500 text-red-500" : ""}`}
                 />
                 <span className="sr-only">
                   {isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
@@ -110,46 +127,31 @@ export function ProductCard({
       </div>
 
       {/* Product Info */}
-      <div className="p-4 space-y-2">
-        {/* Category & Brand */}
-        <div className="flex items-center gap-2 text-[11px] text-neutral-500 uppercase tracking-wider">
-          {product.brand && <span>{product.brand}</span>}
-          {product.brand && product.category && (
-            <span className="text-neutral-300">|</span>
-          )}
-          {product.category && <span>{product.category}</span>}
-        </div>
-
-        {/* Name */}
-        <Link href={`/products/${product.slug}`}>
-          <h3 className="font-medium text-black line-clamp-2 hover:text-[#E10600] transition-colors leading-snug">
+      <div className="p-4">
+        <Link
+          href={`/products/${product.slug}`}
+          className="block group/link"
+        >
+          <h3 className="font-medium text-sm text-neutral-900 line-clamp-2 group-hover/link:text-neutral-600 transition-colors">
             {product.name}
           </h3>
         </Link>
 
-        {/* Price */}
-        <p className="text-lg font-heading font-bold text-black">
-          {formatPrice(product.price)}
-        </p>
-      </div>
+        {product.brand && (
+          <p className="text-xs text-neutral-500 mt-1">{product.brand}</p>
+        )}
 
-      {/* Wishlist Button - Always Visible on Mobile/Touch */}
-      {showActions && onToggleWishlist && (
-        <button
-          className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.preventDefault();
-            onToggleWishlist(product.id);
-          }}
-        >
-          <Heart
-            className={`h-4 w-4 ${isInWishlist ? "fill-[#E10600] text-[#E10600]" : "text-neutral-600"}`}
-          />
-          <span className="sr-only">
-            {isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        <div className="flex items-center justify-between mt-3">
+          <span className="text-sm font-semibold text-neutral-900">
+            {formatCurrency(product.price)}
           </span>
-        </button>
-      )}
+          {product.tags && product.tags.length > 0 && (
+            <span className="text-[10px] text-neutral-400">
+              {product.tags[0]}
+            </span>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

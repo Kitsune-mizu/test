@@ -23,23 +23,14 @@ export default async function ProductsPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  // Get current user
+  // Get current user for cart count
   const {
     data: { user: authUser },
   } = await supabase.auth.getUser();
 
-  let user = null;
   let cartCount = 0;
 
   if (authUser) {
-    const { data: userProfile } = await supabase
-      .from("users")
-      .select("id, name, role")
-      .eq("id", authUser.id)
-      .single();
-
-    user = userProfile;
-
     const { count } = await supabase
       .from("cart")
       .select("*", { count: "exact", head: true })
@@ -101,7 +92,7 @@ export default async function ProductsPage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header user={user} cartCount={cartCount} />
+      <Header cartCount={cartCount} />
       <main className="flex-1">
         <Suspense fallback={<JapaneseSkeleton />}>
           <div className="container mx-auto px-4 py-8">
