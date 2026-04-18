@@ -5,42 +5,38 @@
 
 /* 
  * Hikaru Bouken — 光る冒険
- * Color Scheme: Black, White, Red Accent (#E10600)
- * Modern, Minimal, Clean, High-end
+ * Black / White / Red Accent (#E10600)
  */
 
+/* ===== ROOT VARIABLES ===== */
 :root {
-  /* Core Colors */
+  /* Core */
   --background: #ffffff;
   --foreground: #000000;
 
-  /* Card & Popover */
+  /* UI */
   --card: #ffffff;
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
 
-  /* Primary - Red Accent */
+  /* Brand */
   --primary: #e10600;
   --primary-foreground: #ffffff;
 
-  /* Secondary - Light Gray */
   --secondary: #f5f5f5;
   --secondary-foreground: #000000;
 
-  /* Muted - Neutral Tones */
   --muted: #f5f5f5;
   --muted-foreground: #737373;
 
-  /* Accent - Red */
   --accent: #e10600;
   --accent-foreground: #ffffff;
 
-  /* Destructive */
   --destructive: #e10600;
   --destructive-foreground: #ffffff;
 
-  /* Borders & Input */
+  /* Borders */
   --border: #e5e5e5;
   --input: #f5f5f5;
   --ring: #e10600;
@@ -55,7 +51,7 @@
   /* Radius */
   --radius: 0px;
 
-  /* Sidebar - Dark */
+  /* Sidebar */
   --sidebar: #000000;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #e10600;
@@ -64,75 +60,95 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #262626;
   --sidebar-ring: #e10600;
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Outfit", system-ui, sans-serif;
 }
 
+/* ===== DARK MODE ===== */
 .dark {
   --background: #000000;
   --foreground: #ffffff;
+
   --card: #0a0a0a;
   --card-foreground: #ffffff;
+
   --popover: #0a0a0a;
   --popover-foreground: #ffffff;
+
   --primary: #e10600;
   --primary-foreground: #ffffff;
+
   --secondary: #262626;
   --secondary-foreground: #ffffff;
+
   --muted: #262626;
   --muted-foreground: #a3a3a3;
+
   --accent: #e10600;
   --accent-foreground: #ffffff;
+
   --destructive: #e10600;
   --destructive-foreground: #ffffff;
+
   --border: #262626;
   --input: #171717;
   --ring: #e10600;
+
   --chart-1: #e10600;
   --chart-2: #ffffff;
   --chart-3: #a3a3a3;
   --chart-4: #525252;
   --chart-5: #262626;
+
   --sidebar: #0a0a0a;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #e10600;
-  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #171717;
-  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #171717;
-  --sidebar-ring: #e10600;
 }
 
+/* ===== THEME MAPPING ===== */
 @theme inline {
-  --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
-  --font-heading: "Outfit", "Outfit Fallback", system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius));
-  --radius-md: calc(var(--radius));
-  --radius-lg: calc(var(--radius));
-  --radius-xl: calc(var(--radius));
+
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -143,21 +159,28 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ===== BASE ===== */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
   }
 
-  /* Custom Selection Color */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+
   ::selection {
     background-color: #e10600;
     color: #ffffff;
   }
 }
 
+/* ===== UTILITIES ===== */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -167,10 +190,6 @@
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
@@ -183,13 +202,13 @@
   }
 }
 
+/* ===== ANIMATION ===== */
 @keyframes floatToCart {
   0% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    opacity: 1;
     transform: translate(-50%, -100px) scale(1.1);
   }
   100% {

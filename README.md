@@ -69,167 +69,6 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
 - **Lucide React** - Icons
 - **Zod** - Schema validation
 
-## 📁 Project Structure
-
-```
-app/
-├── admin/                    # Admin dashboard
-│   ├── layout.tsx           # Admin layout with sidebar
-│   ├── dashboard/page.tsx   # Dashboard overview
-│   ├── products/            # Product management
-│   ├── orders/page.tsx      # Order management
-│   ├── customers/page.tsx   # Customer list
-│   ├── notifications/       # Notifications
-│   ├── analytics/page.tsx   # Analytics
-│   ├── settings/page.tsx    # Admin settings
-│   └── auth/login/page.tsx  # Admin login (hidden URL)
-├── account/                 # Customer account
-│   ├── page.tsx            # Profile page
-│   ├── orders/             # Order history
-│   ├── wishlist/page.tsx   # Wishlist
-│   └── layout.tsx          # Account layout with sidebar
-├── auth/                   # Authentication pages
-│   ├── login/page.tsx      # Customer login
-│   ├── sign-up/page.tsx    # Sign up
-│   └── logout/route.ts     # Logout
-├── cart/page.tsx           # Shopping cart
-├── checkout/page.tsx       # Checkout page
-├── products/               # Product pages
-│   ├── page.tsx            # Product listing
-│   └── [slug]/page.tsx     # Product detail
-├── api/                    # API endpoints
-│   ├── products/           # Product management API
-│   └── seed/products/      # Demo data seeding
-├── page.tsx                # Homepage
-└── layout.tsx              # Root layout
-
-components/
-├── admin/
-│   ├── admin-sidebar.tsx   # Admin navigation
-│   └── product-form.tsx    # Product create/edit form
-├── home/
-│   ├── hero-section.tsx    # Hero banner
-│   ├── featured-products.tsx
-│   ├── category-grid.tsx
-│   └── value-proposition.tsx
-├── products/
-│   ├── product-card.tsx    # Product card component
-│   ├── product-details.tsx # Product detail view
-│   ├── product-filters.tsx # Filter sidebar
-│   ├── products-grid.tsx   # Products grid
-│   ├── product-reviews.tsx # Reviews section
-│   └── related-products.tsx
-├── cart/
-│   ├── cart-items.tsx      # Cart items list
-│   └── cart-summary.tsx    # Cart totals
-├── checkout/
-│   ├── checkout-form.tsx   # Checkout form
-│   └── order-summary.tsx   # Order summary
-├── account/
-│   ├── account-sidebar.tsx # Account navigation
-│   └── profile-form.tsx    # Profile form
-├── layout/
-│   ├── header.tsx          # Site header with nav
-│   └── footer.tsx          # Site footer
-└── ui/                     # ShadCN UI components
-```
-
-## 🗄️ Database Schema
-
-### Users
-
-```sql
-- id (UUID)
-- name (TEXT)
-- email (TEXT)
-- phone (TEXT)
-- address (TEXT)
-- role (ENUM: 'customer', 'admin')
-- created_at (TIMESTAMP)
-```
-
-### Products
-
-```sql
-- id (UUID)
-- name (TEXT)
-- slug (TEXT) - unique
-- description (TEXT)
-- category (TEXT)
-- brand (TEXT)
-- price (NUMERIC)
-- stock (INTEGER)
-- image_url (TEXT)
-- tags (TEXT[])
-- created_at (TIMESTAMP)
-```
-
-### Orders
-
-```sql
-- id (UUID)
-- user_id (UUID) - FK to users
-- total_price (NUMERIC)
-- payment_method (TEXT)
-- shipping_method (TEXT)
-- shipping_address (TEXT)
-- status (ENUM: pending, confirmed, preparing, shipped, delivered, cancelled)
-- created_at (TIMESTAMP)
-```
-
-### Order Items
-
-```sql
-- id (UUID)
-- order_id (UUID) - FK to orders
-- product_id (UUID) - FK to products
-- quantity (INTEGER)
-- price (NUMERIC)
-```
-
-### Cart
-
-```sql
-- id (UUID)
-- user_id (UUID) - FK to users
-- product_id (UUID) - FK to products
-- quantity (INTEGER)
-- created_at (TIMESTAMP)
-```
-
-### Wishlist
-
-```sql
-- id (UUID)
-- user_id (UUID) - FK to users
-- product_id (UUID) - FK to products
-- created_at (TIMESTAMP)
-```
-
-### Reviews
-
-```sql
-- id (UUID)
-- user_id (UUID) - FK to users
-- product_id (UUID) - FK to products
-- order_id (UUID) - FK to orders (nullable)
-- rating (INTEGER: 1-5)
-- comment (TEXT)
-- created_at (TIMESTAMP)
-```
-
-### Notifications
-
-```sql
-- id (UUID)
-- user_id (UUID) - FK to users
-- message (TEXT)
-- link (TEXT)
-- type (TEXT: order, system, etc)
-- read_status (BOOLEAN)
-- created_at (TIMESTAMP)
-```
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -279,40 +118,6 @@ components/
 - Email: `admin@example.com`
 - Password: `admin123456`
 
-## 📍 Key Routes
-
-### Customer Routes
-
-- `/` - Homepage
-- `/products` - Product listing
-- `/products/[slug]` - Product detail
-- `/cart` - Shopping cart
-- `/checkout` - Checkout page
-- `/auth/login` - Customer login
-- `/auth/sign-up` - Sign up
-- `/account` - Profile
-- `/account/orders` - Order history
-- `/account/wishlist` - Wishlist
-
-### Admin Routes
-
-- `/admin/auth/login` - Admin login (hidden, must type manually)
-- `/admin/dashboard` - Dashboard
-- `/admin/products` - Product management
-- `/admin/products/new` - Create product
-- `/admin/products/[id]/edit` - Edit product
-- `/admin/orders` - Order management
-- `/admin/customers` - Customer list
-- `/admin/analytics` - Analytics
-- `/admin/settings` - Admin settings
-
-### API Routes
-
-- `POST /api/products` - Create product
-- `GET /api/products` - List products (with filters)
-- `PATCH /api/products/[id]` - Update product
-- `DELETE /api/products/[id]` - Delete product
-- `POST /api/seed/products` - Seed demo products
 
 ## 🔐 Security Features
 
@@ -394,23 +199,174 @@ This project demonstrates:
 
 University Project - Educational Purpose Only
 
-## 🤝 Support
 
-For issues or questions:
-
-1. Check the documentation
-2. Review Supabase setup
-3. Verify environment variables
-4. Check browser console for errors
 
 ---
 
-**Built with ❤️ for modern e-commerce**
 
 光る冒険 - Hikaru Bouken (Shining Adventure)
-#   H i B 
- 
- # HiB
-#   t e s t 
- 
- 
+
+### 1. Environment Setup
+
+Pastikan `.env.local` sudah memiliki:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+```
+
+### 2. Initialize Database & Demo Data
+
+Kunjungi: **http://localhost:3000/setup**
+
+Halaman ini akan:
+
+- ✅ Membuat semua database tables
+- ✅ Setup Row Level Security (RLS)
+- ✅ Seed 10+ produk demo
+- ✅ Buat 2 demo accounts
+
+### 3. Demo Credentials
+
+Setelah setup, Anda akan mendapat:
+
+**👤 Customer Account**
+
+- Email: `customer@hikaru.test`
+- Password: `DemoPassword123!`
+- Login: http://localhost:3000/auth/login
+- Akses: Browse produk, cart, checkout, order history
+
+**🔐 Admin Account**
+
+- Email: `admin@hikaru.test`
+- Password: `AdminPassword123!`
+- Login: http://localhost:3000/panel/login (HIDDEN - type manually!)
+- Akses: Dashboard, product management, orders, customers
+
+---
+
+### Cara Pertama: Setup Page (RECOMMENDED)
+
+1. Kunjungi `/setup`
+2. Klik "Run Setup"
+3. Gunakan demo admin credentials yang diberikan
+
+### Cara Kedua: Manual (Untuk Production)
+
+1. Sign-up di `/auth/login` sebagai regular customer
+2. Admin lain menambahkan role di Supabase:
+   ```sql
+   UPDATE users SET role = 'admin' WHERE email = 'newemail@example.com';
+   ```
+3. Logout dan login ke `/panel/login`
+
+---
+
+## 🌐 Production Deployment
+
+Untuk deploy ke production (Vercel):
+
+1. Set environment variables di Vercel project:
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL = production_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY = production_key
+   ```
+
+2. Connect Supabase production database
+
+3. Run setup via deployment URL:
+
+   ```
+   https://yourdomain.com/setup
+   ```
+
+   (Kemudian hapus atau protect endpoint ini)
+
+4. Create admin users via database directly
+
+---
+
+### 1. Environment Variables
+
+Add these to your `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+```
+
+### 2. Start Development Server
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Open http://localhost:3000
+
+### 3. Seed Demo Data
+
+Visit: http://localhost:3000/api/seed/products (as admin)
+
+This will add 10 sample products to your database.
+
+
+## 🎨 Branding Elements
+
+### Japanese Text Used
+
+- **冒険** (Bouken) - Adventure
+- **山** (Yama) - Mountain
+- **道** (Michi) - Path
+- **旅** (Tabi) - Journey
+
+### Color Scheme
+
+- **Primary**: Red (#E10600) - Action buttons, highlights
+- **Background**: White/Black - Clean surfaces
+- **Text**: Black/White - Maximum contrast
+- **Accent**: Red highlights - Call-to-action
+
+### Typography
+
+- **Headings**: Outfit font (modern, clean)
+- **Body**: Inter font (readable, professional)
+- **Code**: Geist Mono (technical elements)
+
+## 📦 Product Categories
+
+Available product categories:
+
+- Backpacks (50L+, day packs, hydration packs)
+- Tents (2-4 person, 4-season)
+- Sleeping Bags (thermal rated)
+- Footwear (hiking boots, sandals)
+- Clothing (jackets, layers, gear)
+- Accessories (cookware, bottles, tools)
+- Climbing (harnesses, ropes, protection)
+- Navigation (GPS, compasses, maps)
+
+## 💳 Payment Methods
+
+Supported payment methods:
+
+1. **Credit Card** - Primary payment method
+2. **Debit Card** - Visa, Mastercard, etc.
+3. **Cash on Delivery** - Pay on receipt
+4. **Global Bank Transfer** - International payments
+
+## 🚚 Shipping Options
+
+Supported couriers:
+
+- **DHL** - Express worldwide shipping
+- **FedEx** - Premium international service
+- **JNE** - Domestic coverage
+- **J&T** - Regional delivery
+
+Shipping tiers:
+
+- Standard: Free (5-7 days)
+- Express: $14.99 (2-3 days)
