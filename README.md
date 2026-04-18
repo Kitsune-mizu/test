@@ -106,19 +106,6 @@ A **modern, production-ready e-commerce platform** for outdoor adventure gear. B
    ```
    Open http://localhost:3000
 
-### Demo Credentials
-
-**Customer Login:**
-
-- Email: `customer@example.com`
-- Password: `demo123456`
-
-**Admin Login:**
-
-- Email: `admin@example.com`
-- Password: `admin123456`
-
-
 ## 🔐 Security Features
 
 - **Authentication**: Supabase Auth with JWT tokens
@@ -373,3 +360,4 @@ Shipping tiers:
 
 - Standard: Free (5-7 days)
 - Express: $14.99 (2-3 days)
+# test
